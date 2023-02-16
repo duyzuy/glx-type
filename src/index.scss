@@ -1,0 +1,39 @@
+@font-face {
+  font-family: "GLX-Lato";
+  src: url(assets/fonts/Lato/Lato-Medium.ttf);
+}
+
+@font-face {
+  font-family: "GLX-Lato-Bold";
+  src: url(assets/fonts/Lato/Lato-Bold.ttf);
+  font-weight: bold;
+}
+@font-face {
+  font-family: "GLX-Lato-Regular";
+  src: url(assets/fonts/Lato/Lato-Regular.ttf);
+}
+@font-face {
+  font-family: "GLX-LatoBlack";
+  src: url(assets/fonts/Lato/Lato-Black.ttf);
+  font-weight: bolder;
+}
+@font-face {
+  font-family: "GLX-LatoHeavy";
+  src: url(assets/fonts/Lato/Lato-Heavy.ttf);
+  font-weight: bolder;
+}
+
+.white {
+  color: #fff;
+}
+.center {
+  text-align: center;
+}
+img {
+  margin-left: auto;
+  margin-right: auto;
+}
+body,
+html {
+  font-family: "GLX-Lato";
+}

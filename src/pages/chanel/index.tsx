@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { Container, Grid, Image } from "semantic-ui-react";
-import CustomInput from "../../components/CustomInput";
+import Input from "../../components/Input";
 import Button from "../../components/Button";
 import "./style.scss";
 interface Props {
@@ -29,30 +29,34 @@ const ChanelPage: React.FC<Props> = (props) => {
                 className="register-column"
               >
                 <div className="inner-column">
-                  <Image
-                    src={`${process.env.PUBLIC_URL}/images/zalo/logo-glx-white.svg`}
-                    alt="Galaxy play logo"
-                    className="glx-logo"
-                  />
-                  <p className="subtitle text-white">
-                    Nền tảng xem phim online số 1 tại Việt Nam
-                  </p>
-                  <p className="title">
-                    <span>Đặc quyền </span>
-                    <span>dành cho khách hàng</span>
-                  </p>
-                  <Image
-                    src={`${process.env.PUBLIC_URL}/images/zalo/logo-zlpay.png`}
-                    alt="zalo pay logo"
-                    className="logo-partner"
-                  />
-                  <p className="label">
+                  <div className="glx-section center">
+                    <Image
+                      src={`${process.env.PUBLIC_URL}/images/zalo/logo-glx-white.svg`}
+                      alt="Galaxy play logo"
+                      className="logo"
+                    />
+                    <p className="subtitle white">
+                      Nền tảng xem phim online số 1 tại Việt Nam
+                    </p>
+                  </div>
+                  <div className="partner-section center">
+                    <p className="title white">
+                      <span>Đặc quyền</span>
+                      <span>dành cho khách hàng</span>
+                    </p>
+                    <Image
+                      src={`${process.env.PUBLIC_URL}/images/zalo/logo-zlpay.png`}
+                      alt="zaloPay logo"
+                      className="logo"
+                    />
+                  </div>
+                  <p className="label white center">
                     Vui lòng nhập "SỐ ĐIỆN THOẠI" và nhấn "TIẾP TỤC"
                   </p>
                   <div className="form login-form">
                     <div className="form-inner">
                       <form onSubmit={(e) => e.preventDefault()}>
-                        <CustomInput
+                        <Input
                           name="phoneNumber"
                           placeholder="Nhập số điện thoại"
                           value={""}
