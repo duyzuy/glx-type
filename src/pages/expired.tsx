@@ -1,5 +1,4 @@
 const ExpiredPage = () => {
-
-    return <>expired</>
-}
+  return <>expired</>;
+};
 export default ExpiredPage;

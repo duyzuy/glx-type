@@ -1,5 +1,4 @@
 const ThankyouPage = () => {
-
-    return <>thanks</>
-}
-export default ThankyouPage
+  return <>thanks</>;
+};
+export default ThankyouPage;

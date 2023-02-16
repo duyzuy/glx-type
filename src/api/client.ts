@@ -3,7 +3,6 @@ interface Options {
   headers?: object;
   method: string;
 }
-
 const client = async (input: string, { body, headers, method }: Options) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("glx-token-device") || "";
@@ -32,19 +31,22 @@ const client = async (input: string, { body, headers, method }: Options) => {
 
   const response = await fetch(baseUrl, { ...configs });
 
-  if (response.status !== 200) {
-    throw new Error(`recieved a bad status code [${response.status}]`);
+  if (response.ok) {
+    return {
+      status: response.status,
+      data: response.json(),
+      headers: response.headers,
+    };
+  } else {
+    // const error = new Error(
+    //   errors?.map((e) => e.message).join("\n") ?? "unknown"
+    // );
+    return Promise.reject("error");
   }
-
-  return {
-    status: response.status,
-    data: response.json(),
-    headers: response.headers,
-  };
 };
 
-client.get = async (input: string) => {
-  return await client(input, { method: "GET" });
+client.get = async (input: string, { headers = {} } = {}) => {
+  return await client(input, { method: "GET", headers });
 };
 client.post = (input: string, { body = {}, headers = {}, method = "POST" }) => {
   return client(input, { body, headers, method });
