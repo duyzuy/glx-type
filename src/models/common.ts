@@ -15,6 +15,10 @@ export interface StateInit {
   device: object;
   campaign: object;
 }
+export interface Action {
+  type: string;
+  payload: object;
+}
 export interface Setting {
   campaignInfo: object;
 }
