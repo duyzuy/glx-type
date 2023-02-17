@@ -1,15 +1,64 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Grid, Image } from "semantic-ui-react";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
+import { LoginUser } from "../../models";
+import { loginApi } from "../../api/login";
 import "./style.scss";
 interface Props {
   children?: JSX.Element;
 }
+
+interface FormRegister extends LoginUser {
+  nextAction: any;
+}
+enum LoginActions {
+  CheckAccount = "CheckAccount",
+  VerifyOTP = "VerifyOTP",
+  Login = "Login",
+  CreatePassword = "CreatePassword",
+  ForgotPassword = "ForgotPassword",
+}
 const ChanelPage: React.FC<Props> = (props) => {
   const { chanelType } = useParams();
-  console.log(process.env.PUBLIC_URL);
+
+  const [loginData, setLoginData] = useState<FormRegister>({
+    phone: "",
+    otpCode: "",
+    password: "",
+    nextAction: LoginActions.CheckAccount,
+  });
+  const [formState, setFormState] = useState<{
+    isShowPassword: boolean;
+    isShowOTP: boolean;
+  }>({
+    isShowPassword: false,
+    isShowOTP: false,
+  });
+  const onChange = (key: string, value: string) => {
+    setLoginData((prevState) => ({
+      ...prevState,
+      [key]: value,
+    }));
+  };
+  const onHandleSubmit = useCallback(async () => {
+    if (loginData.nextAction === LoginActions.CheckAccount) {
+      const response = await loginApi.checkAccount({
+        phone: Number(loginData.phone),
+      });
+      console.log({ response });
+    } else {
+      switch (loginData.nextAction) {
+        case LoginActions.CreatePassword: {
+          break;
+        }
+        case LoginActions.ForgotPassword: {
+          break;
+        }
+      }
+    }
+  }, [loginData, formState]);
   return (
     <div className="page">
       <div className="inner-page">
@@ -59,15 +108,21 @@ const ChanelPage: React.FC<Props> = (props) => {
                         <Input
                           name="phoneNumber"
                           placeholder="Nhập số điện thoại"
-                          value={""}
+                          value={loginData.phone}
                           maxLength={10}
-                          onChange={(e) => console.log(e.target.value)}
+                          onChange={(e) => onChange("phone", e.target.value)}
                           onKeyUp={(e) => {
                             console.log(e.key);
                           }}
                           error={"asdf"}
                         />
-                        <Button type="button">Tiếp tục</Button>
+                        <Button
+                          type="button"
+                          color="primary"
+                          onClick={onHandleSubmit}
+                        >
+                          Tiếp tục
+                        </Button>
                       </form>
                     </div>
                   </div>

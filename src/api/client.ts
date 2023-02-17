@@ -27,7 +27,7 @@ const client = async (input: string, { body, headers, method }: Options) => {
     configs.body = JSON.stringify({ ...body });
   }
 
-  const baseUrl = `${apiUrl}"/"${input}`;
+  const baseUrl = `${apiUrl}/${input}`;
 
   const response = await fetch(baseUrl, { ...configs });
 
@@ -48,7 +48,7 @@ const client = async (input: string, { body, headers, method }: Options) => {
 client.get = async (input: string, { headers = {} } = {}) => {
   return await client(input, { method: "GET", headers });
 };
-client.post = (input: string, { body = {}, headers = {}, method = "POST" }) => {
-  return client(input, { body, headers, method });
+client.post = (input: string, { body = {}, headers = {} }) => {
+  return client(input, { body, headers, method: "POST" });
 };
 export default client;

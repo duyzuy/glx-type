@@ -7,7 +7,7 @@ const Input: React.FC<{
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyUp?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-  value?: string;
+  value?: string | number | undefined;
   maxLength?: number;
   error?: string;
   className?: string;

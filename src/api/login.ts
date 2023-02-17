@@ -5,23 +5,26 @@ interface AccountInfo {
   code?: number;
   password?: string;
 }
-export const checkAccount = async ({ phone }: Pick<AccountInfo, "phone">) => {
-  return await client.get(`account/phone/check/${phone}`);
-};
-export const verifyPhoneNumber = async (phone: Pick<AccountInfo, "phone">) => {
-  return await client
-    .post(`account/phone/verify?phone=${phone}`, {
-      body: {
-        phone: phone,
-      },
-    })
-    .then((response) => {
-      console.log({ response });
-      return response;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+
+export const loginApi = {
+  checkAccount: async ({ phone }: Pick<AccountInfo, "phone">) => {
+    return await client.get(`account/phone/check/${phone}`);
+  },
+  verifyPhoneNumber: async (phone: Pick<AccountInfo, "phone">) => {
+    return await client
+      .post(`account/phone/verify?phone=${phone}`, {
+        body: {
+          phone: phone,
+        },
+      })
+      .then((response) => {
+        console.log({ response });
+        return response;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
 };
 
 export const createAccount = async ({

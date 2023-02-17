@@ -11,14 +11,17 @@ const Button: React.FC<{
 }> = (props) => {
   const { onClick, size, color, children, className, ...rest } = props;
   const classes = useMemo(() => {
-    let cls = "btn";
+    let clss = "btn";
     if (className) {
-      cls = cls.concat(" ", cls);
+      clss = clss.concat(" ", clss);
     }
     if (color) {
-      cls = cls.concat(" ", color);
+      if (color === "primary" || color === "secondary") {
+        clss = clss.concat(" ", color);
+      }
     }
-    return cls;
+
+    return clss;
   }, [className, color]);
 
   return (
