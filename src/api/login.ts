@@ -8,7 +8,11 @@ interface AccountInfo {
 
 export const loginApi = {
   checkAccount: async ({ phone }: Pick<AccountInfo, "phone">) => {
-    return await client.get(`account/phone/check/${phone}`);
+    return await client.get(`account/phone/check/${phone}`, {
+      headers: {
+        "access-token": "aaaa",
+      },
+    });
   },
   verifyPhoneNumber: async (phone: Pick<AccountInfo, "phone">) => {
     return await client

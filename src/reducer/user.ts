@@ -1,11 +1,11 @@
 import { UserInfo, Action } from "../models";
 import { FETCH_USER_INFO } from "../constants/actions";
-const userState: Partial<UserInfo> = {
+const userInfoState: Partial<UserInfo> = {
   phone: "",
   email: "",
 };
 
-const userReducer = (state: UserInfo, action: Action) => {
+const userReducer = (state: Partial<UserInfo>, action: Action) => {
   switch (action.type) {
     case FETCH_USER_INFO: {
       return {
@@ -17,4 +17,4 @@ const userReducer = (state: UserInfo, action: Action) => {
   }
 };
 export default userReducer;
-export { userState };
+export { userInfoState };

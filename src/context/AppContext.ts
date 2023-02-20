@@ -1,4 +1,4 @@
 import { createContext } from "react";
-type AppContextType = [] | null;
-const AppContext = createContext<AppContextType>(null);
+type AppContextType = object;
+const AppContext = createContext<AppContextType>({});
 export default AppContext;

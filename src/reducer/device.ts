@@ -1,9 +1,12 @@
-import { Action } from "../models";
+import { Action, DeviceInfo } from "../models";
 import { FETCH_DEVICE } from "../constants/actions";
 
-const deviceState = {};
+const deviceState: Partial<DeviceInfo> = {
+  info: {},
+  ipAddress: "",
+};
 
-const deviceReducer = (state: object, action: Action) => {
+const deviceReducer = (state: Partial<DeviceInfo>, action: Action) => {
   switch (action.type) {
     case FETCH_DEVICE: {
       return {

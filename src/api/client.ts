@@ -29,12 +29,12 @@ const client = async (input: string, { body, headers, method }: Options) => {
 
   const baseUrl = `${apiUrl}/${input}`;
 
-  const response = await fetch(baseUrl, { ...configs });
+  const response: Response = await fetch(baseUrl, { ...configs });
 
   if (response.ok) {
     return {
       status: response.status,
-      data: response.json(),
+      data: await response.json(),
       headers: response.headers,
     };
   } else {

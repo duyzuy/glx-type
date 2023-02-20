@@ -4,21 +4,18 @@ export interface Configs {
   method: string;
 }
 
-export interface StateInit {
-  booking: object;
-  userInfo: {
-    phone: string | "";
-    email: string | "";
-  };
-  promotions: object;
-  paymentMethods: object;
-  device: object;
-  campaign: object;
-}
 export interface Action {
   type: string;
-  payload: object;
+  payload: { [keyName: string]: any };
 }
 export interface Setting {
   campaignInfo: object;
 }
+
+export enum StorageKEY {
+  deviceToken = "glx_device_token",
+  authToken = "glx_auth_token",
+  campaignStatus = "glx_campaign_status",
+  ipAddress = "glx_ipAddress",
+}
+export type ReducerKeys = "userInfo" | "deviceInfo";
