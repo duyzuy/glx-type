@@ -13,4 +13,14 @@
       outline: none;
     }
   }
+  &.error {
+    input {
+      margin-bottom: 10px;
+    }
+  }
+  .error-message {
+    color: #fff;
+    font-size: 12px;
+    text-align: center;
+  }
 }

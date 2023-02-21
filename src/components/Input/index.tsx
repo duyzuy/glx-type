@@ -41,6 +41,7 @@ const Input: React.FC<{
         onKeyUp={onKeyUp}
         value={value}
       />
+      {(error && <p className="error-message">{error}</p>) || <></>}
     </div>
   );
 };

@@ -10,25 +10,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-top: 30px;
+    padding-bottom: 30px;
   }
-
+  .image-column {
+    display: flex;
+    align-items: center;
+  }
   .glx-section {
     margin-bottom: 20px;
   }
   .partner-section {
     margin-bottom: 30px;
+    .title {
+      font-size: 24px;
+      span {
+        display: block;
+        font-weight: bold;
+      }
+    }
     .logo {
       max-width: 240px;
     }
   }
-  .title {
-    font-size: 24px;
-    text-transform: uppercase;
-    span {
-      display: block;
-      font-weight: bold;
-    }
-  }
+
   .login-form {
     padding: 20px;
     .field {

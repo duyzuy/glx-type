@@ -4,60 +4,59 @@ import Button from "../Button";
 import "./style.scss";
 const Modal = ({
   title,
-  isShow,
+  isOpen,
   render,
   onCancel,
   onSubmit,
   onClose,
   width = 550,
-  center,
+  isCenter,
   isShowCloseIcon = true,
   className,
   isShowFooter = true,
+  isShowHeader = true,
 }: {
   title?: string;
-  isShow?: boolean;
+  isOpen?: boolean;
   render: Function;
   onCancel?: () => void;
   onSubmit?: () => void;
   onClose?: () => void;
   width?: number;
-  center?: boolean;
+  isCenter?: boolean;
   isShowCloseIcon?: boolean;
   className?: string;
   isShowFooter?: boolean;
+  isShowHeader?: boolean;
 }) => {
   const classes = useMemo(() => {
     let clss = "glx__modal";
-    if (center) {
+    if (isCenter) {
       clss = clss.concat(" ", "center");
     }
     if (className && className !== "") {
       clss = clss.concat(" ", className);
     }
     return clss;
-  }, [center]);
+  }, [isCenter]);
   useEffect(() => {
-    if (isShow) {
-      document.body.classList.add("fixed");
-    } else {
-      document.body.classList.remove("fixed");
-    }
-  }, [isShow]);
-
-  if (!isShow) return null;
+    isOpen
+      ? document.body.classList.add("fixed")
+      : document.body.classList.remove("fixed");
+  }, [isOpen]);
 
   if (render && typeof render !== "function")
     throw new Error("render must function");
 
+  if (!isOpen) return <></>;
   return (
     <div className={classes}>
       <div className="glx__modal--overlay" onClick={onClose}></div>
       <div className="glx__modal--container">
         <div className="glx__modal--inner" style={{ maxWidth: width }}>
-          {(title && (
+          {(isShowHeader && (
             <div className="glx__modal--header">
-              <h4>{title}</h4>
+              {(title && <h4 className="title">{title}</h4>) || <></>}
               {(isShowCloseIcon && (
                 <div className="glx__modal--close" onClick={onClose}>
                   <Icon.X size={16} />
@@ -65,6 +64,7 @@ const Modal = ({
               )) || <></>}
             </div>
           )) || <></>}
+
           <div className="glx__modal--body">{render()}</div>
           {(isShowFooter && (
             <div className="glx__modal--footer">

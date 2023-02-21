@@ -3,16 +3,22 @@ import { useParams } from "react-router-dom";
 import { Container, Grid, Image } from "semantic-ui-react";
 import Input from "../../components/Input";
 import Button from "../../components/Button";
-import { LoginUser } from "../../models";
 import { loginApi } from "../../api/login";
 import "./style.scss";
 import Modal from "../../components/Modal";
+import ModalContent from "./components/ModalContent";
+import { loginSchema } from "../../utils/validator";
+import * as yup from "yup";
+
 interface Props {
   children?: JSX.Element;
 }
 
-interface FormRegister extends LoginUser {
-  nextAction: any;
+interface FormRegister {
+  phoneNumber: string;
+  otpCode: string;
+  password: string;
+  nextAction: LoginActions;
 }
 enum LoginActions {
   CheckAccount = "CheckAccount",
@@ -25,7 +31,7 @@ const ChanelPage: React.FC<Props> = (props) => {
   const { chanelType } = useParams();
 
   const [loginData, setLoginData] = useState<FormRegister>({
-    phone: "",
+    phoneNumber: "",
     otpCode: "",
     password: "",
     nextAction: LoginActions.CheckAccount,
@@ -39,6 +45,10 @@ const ChanelPage: React.FC<Props> = (props) => {
     isShowOTP: false,
     isShowModal: false,
   });
+  const [errors, setErrors] = useState<
+    Partial<Pick<FormRegister, "phoneNumber" | "otpCode" | "password">>
+  >({});
+
   const onChange = (key: string, value: string) => {
     setLoginData((prevState) => ({
       ...prevState,
@@ -49,72 +59,96 @@ const ChanelPage: React.FC<Props> = (props) => {
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (loginData.nextAction === LoginActions.CheckAccount) {
-        const checkAccount = await loginApi.checkAccount({
-          phone: loginData.phone,
-        });
+        loginSchema
+          .validate(
+            { phoneNumber: loginData.phoneNumber },
+            { abortEarly: false }
+          )
+          .then(async (data) => {
+            const checkAccount = await loginApi.checkAccount({
+              phone: data.phoneNumber,
+            });
+            if (checkAccount.code === 0) {
+              /**
+               * is Registed
+               * Next:
+               * Check Promotions
+               *
+               * Show password field
+               * Take user do the login action
+               * #
+               * Show popup Modal;
+               * Take user do the login with another phone number
+               */
 
-        if (checkAccount.code === 0) {
-          /**
-           * is Registed
-           * Next:
-           * Check Promotions
-           * @if valid
-           * Show password field
-           * Take user do the login action
-           * @else
-           * Show popup Modal;
-           * Take user do the login with another phone number
-           */
-
-          const getOffer = await loginApi.getOffer({ phone: loginData.phone });
-          if (getOffer.error === 0 && getOffer.data.promotions) {
-            //show password field
-            setFormState(() => ({
-              isShowModal: false,
-              isShowOTP: false,
-              isShowPassword: true,
-            }));
-            setLoginData((prevState) => ({
-              ...prevState,
-              nextAction: LoginActions.Login,
-            }));
-            return;
-          } else {
-            //Show popup Modal
-            setFormState(() => ({
-              isShowModal: true,
-              isShowOTP: false,
-              isShowPassword: false,
-            }));
-            return;
-          }
-        }
-        if (checkAccount.code === 1) {
-          /**
-           * New user
-           * Next:
-           * Send OTP code then show OTP field
-           * Take user do the verify OTP action
-           */
-          setFormState(() => ({
-            isShowModal: false,
-            isShowOTP: true,
-            isShowPassword: false,
-          }));
-          setLoginData((prevState) => ({
-            ...prevState,
-            nextAction: LoginActions.VerifyOTP,
-          }));
-          return;
-        }
+              const getOffer = await loginApi.getOffer({
+                phone: loginData.phoneNumber,
+              });
+              if (getOffer.error === 0 && getOffer.data.promotions) {
+                //show password field
+                setFormState(() => ({
+                  isShowModal: false,
+                  isShowOTP: false,
+                  isShowPassword: true,
+                }));
+                setLoginData((prevState) => ({
+                  ...prevState,
+                  nextAction: LoginActions.Login,
+                }));
+                return;
+              } else {
+                //Show popup Modal
+                setFormState(() => ({
+                  isShowModal: true,
+                  isShowOTP: false,
+                  isShowPassword: false,
+                }));
+                return;
+              }
+            }
+            if (checkAccount.code === 1) {
+              /**
+               * New user
+               * Next:
+               * Send OTP code then show OTP field
+               * Take user do the verify OTP action
+               */
+              setFormState(() => ({
+                isShowModal: false,
+                isShowOTP: true,
+                isShowPassword: false,
+              }));
+              setLoginData((prevState) => ({
+                ...prevState,
+                nextAction: LoginActions.VerifyOTP,
+              }));
+              return;
+            }
+          })
+          .catch((errors) => {
+            if (errors instanceof yup.ValidationError) {
+              const errorMessage = errors.inner.reduce(
+                (acc: object, current: any) => {
+                  return {
+                    ...acc,
+                    [current.path]: current.message,
+                  };
+                },
+                {}
+              );
+              setErrors(errorMessage);
+            }
+          });
       } else {
         switch (loginData.nextAction) {
           case LoginActions.VerifyOTP: {
             const response = await loginApi.createAccount({
-              phone: loginData.phone,
+              phone: loginData.phoneNumber,
               code: loginData.otpCode,
             });
+            console.log({ response });
             if (response.data.statusCode === 400) {
+            } else {
             }
             break;
           }
@@ -140,8 +174,13 @@ const ChanelPage: React.FC<Props> = (props) => {
       <div className="inner-page">
         <Container>
           <div className="section">
-            <Grid>
-              <Grid.Column mobile={16} tablet={8} computer={8}>
+            <Grid verticalAlign="middle" centered>
+              <Grid.Column
+                mobile={16}
+                tablet={8}
+                computer={8}
+                className="image-column"
+              >
                 <Image
                   src={`${process.env.PUBLIC_URL}/images/zalo/image-promotion-top.png`}
                   alt=""
@@ -165,7 +204,7 @@ const ChanelPage: React.FC<Props> = (props) => {
                     </p>
                   </div>
                   <div className="partner-section center">
-                    <p className="title white">
+                    <p className="title upercase white">
                       <span>Đặc quyền</span>
                       <span>dành cho khách hàng</span>
                     </p>
@@ -184,13 +223,15 @@ const ChanelPage: React.FC<Props> = (props) => {
                         <Input
                           name="phoneNumber"
                           placeholder="Nhập số điện thoại"
-                          value={loginData.phone}
+                          value={loginData.phoneNumber}
                           maxLength={10}
-                          onChange={(e) => onChange("phone", e.target.value)}
+                          onChange={(e) =>
+                            onChange("phoneNumber", e.target.value)
+                          }
                           onKeyUp={(e) => {
                             console.log(e.key);
                           }}
-                          error={"asdf"}
+                          error={errors.phoneNumber}
                         />
                         {(formState.isShowPassword && (
                           <>
@@ -207,7 +248,7 @@ const ChanelPage: React.FC<Props> = (props) => {
                                 onKeyUp={(e) => {
                                   console.log(e.key);
                                 }}
-                                error={"asdf"}
+                                error={errors.password}
                               />
                               <div className="forgot">
                                 <button>Quên mật khẩu</button>
@@ -243,11 +284,17 @@ const ChanelPage: React.FC<Props> = (props) => {
           </div>
         </Container>
         <Modal
-          title="Thong bao"
-          isShow={formState.isShowModal}
-          render={() => {
-            return "asdf";
-          }}
+          title="Rất tiếc"
+          isCenter={true}
+          isOpen={formState.isShowModal}
+          width={400}
+          onClose={() =>
+            setFormState((prevState) => ({ ...prevState, isShowModal: false }))
+          }
+          onCancel={() =>
+            setFormState((prevState) => ({ ...prevState, isShowModal: false }))
+          }
+          render={() => <ModalContent />}
         />
       </div>
     </div>
