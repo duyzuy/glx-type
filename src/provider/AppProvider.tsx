@@ -10,23 +10,23 @@ import {
 import client from "../api/client";
 
 import { StorageKEY, ReducerKeys } from "../models";
-
+import { logger } from "../hooks/logger";
 const AppProvider: React.FC<{ children: React.ReactNode }> = (props) => {
-  const [state, dispatch] = useReducer(rootReducer, initialState);
+  const [state, dispatch] = useReducer(logger(rootReducer), initialState);
   const deviceInfor = useDevice();
 
-  const bodyParams = {
-    app_version: "2.0.0",
-    modelId: deviceInfor.browser,
-    modelName: "108",
-    os: deviceInfor.os,
-    os_version: deviceInfor.osVer,
-    partner: deviceInfor.partner,
-    platform: "web",
-  };
   //fetchDevice
   const fetchDeviceInfo = async () => {
     let data = { token: "", ipAddress: "" };
+    const bodyParams = {
+      app_version: "2.0.0",
+      modelId: deviceInfor.browser,
+      modelName: "108",
+      os: deviceInfor.os,
+      os_version: deviceInfor.osVer,
+      partner: deviceInfor.partner,
+      platform: "web",
+    };
     try {
       const response: {
         headers: Headers;
@@ -48,7 +48,7 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = (props) => {
         dispatch({
           type: FETCH_DEVICE,
           payload: {
-            info: bodyParams,
+            device: bodyParams,
             ipAddress: response.data.ip,
           },
         });
@@ -70,15 +70,34 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = (props) => {
         },
       });
       dispatch({ type: FETCH_CAMPAIGN_INFOR, payload: response.data.data });
+      localStorage.setItem(
+        StorageKEY.campaignStatus,
+        JSON.stringify({ isActive: response.data.data })
+      );
     } catch (error) {
       console.log(error);
     }
   };
   useEffect(() => {
     (async () => {
-      const deviceToken = localStorage.getItem(StorageKEY.deviceToken);
+      const deviceToken = localStorage.getItem(StorageKEY.deviceToken) || "";
       if (deviceToken) {
         fetchCampaignInfo({ token: deviceToken });
+        dispatch({
+          type: FETCH_DEVICE,
+          payload: {
+            device: {
+              app_version: "2.0.0",
+              modelId: deviceInfor.browser,
+              modelName: "108",
+              os: deviceInfor.os,
+              os_version: deviceInfor.osVer,
+              partner: deviceInfor.partner,
+              platform: "web",
+            },
+            ipAddress: localStorage.getItem(StorageKEY.ipAddress),
+          },
+        });
       } else {
         const data = await fetchDeviceInfo();
         await fetchCampaignInfo({ token: data.token });

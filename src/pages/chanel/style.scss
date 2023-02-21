@@ -29,4 +29,26 @@
       font-weight: bold;
     }
   }
+  .login-form {
+    padding: 20px;
+    .field {
+      margin-bottom: 20px;
+      input {
+        border-radius: 100px;
+        height: 60px;
+        padding: 10px 20px;
+        font-size: 20px;
+        text-align: center;
+      }
+    }
+    button {
+      height: 60px;
+      border-radius: 30px;
+      width: 100%;
+      max-width: 240px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 20px;
+    }
+  }
 }

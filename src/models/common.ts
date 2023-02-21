@@ -8,6 +8,10 @@ export interface Action {
   type: string;
   payload: { [keyName: string]: any };
 }
+export interface StateInit {
+  userInfo: { [key: string]: any };
+  setting: { [key: string]: any };
+}
 export interface Setting {
   campaignInfo: object;
 }
@@ -18,4 +22,4 @@ export enum StorageKEY {
   campaignStatus = "glx_campaign_status",
   ipAddress = "glx_ipAddress",
 }
-export type ReducerKeys = "userInfo" | "deviceInfo";
+export type ReducerKeys = "userInfo" | "setting";

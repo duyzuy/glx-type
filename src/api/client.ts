@@ -31,18 +31,11 @@ const client = async (input: string, { body, headers, method }: Options) => {
 
   const response: Response = await fetch(baseUrl, { ...configs });
 
-  if (response.ok) {
-    return {
-      status: response.status,
-      data: await response.json(),
-      headers: response.headers,
-    };
-  } else {
-    // const error = new Error(
-    //   errors?.map((e) => e.message).join("\n") ?? "unknown"
-    // );
-    return Promise.reject("error");
-  }
+  return {
+    status: response.status,
+    data: await response.json(),
+    headers: response.headers,
+  };
 };
 
 client.get = async (input: string, { headers = {} } = {}) => {

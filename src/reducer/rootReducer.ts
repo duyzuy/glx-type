@@ -1,6 +1,6 @@
 import { Action } from "../models";
 import userReducer, { userInfoState } from "./user";
-import deviceReducer, { deviceState } from "./device";
+import settingReducer, { settingState } from "./setting";
 import { ReducerKeys } from "../models";
 
 const combineReducer =
@@ -18,12 +18,12 @@ const combineReducer =
   };
 
 const initialState: Record<ReducerKeys, object> = {
-  deviceInfo: deviceState,
+  setting: settingState,
   userInfo: userInfoState,
 };
 const rootReducer = combineReducer({
   userInfo: userReducer,
-  deviceInfo: deviceReducer,
+  setting: settingReducer,
 });
 
 export default rootReducer;
