@@ -14,5 +14,7 @@ export const useSelector = (cb: (params?: any) => void) => {
 export const useDispatch: Function = () => {
   const [_, dispatch] = useContext(AppContext);
 
-  return dispatch;
+  return (cb: any) => dispatch(cb);
 };
+
+export const asyncActions = (action: Function) => {};

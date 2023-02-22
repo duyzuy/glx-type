@@ -355,7 +355,10 @@ const ChanelPage: React.FC<Props> = (props) => {
     [loginData, formState]
   );
   useEffect(() => {
-    dispatch(getUserInfo());
+    (async () => {
+      const data = await dispatch(getUserInfo());
+      console.log({ data });
+    })();
   }, []);
   return (
     <div className="page">
