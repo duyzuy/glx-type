@@ -11,7 +11,7 @@ export const useSelector = (cb: (params?: any) => void) => {
   return state;
 };
 
-export const useDispatch = () => {
+export const useDispatch: Function = () => {
   const [_, dispatch] = useContext(AppContext);
 
   return dispatch;

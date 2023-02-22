@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Grid, Image } from "semantic-ui-react";
 import Input from "../../components/Input";
@@ -12,6 +12,7 @@ import * as yup from "yup";
 import { StorageKEY } from "../../models";
 import { FETCH_CAMPAIGN_INFOR, FETCH_USER_INFO } from "../../constants/actions";
 import { useDispatch } from "../../provider/hooks";
+import { getUserInfo } from "./actions";
 interface Props {
   children?: JSX.Element;
 }
@@ -316,7 +317,13 @@ const ChanelPage: React.FC<Props> = (props) => {
                     response.rfToken
                   );
                   const userInfo = await loginApi.getUserInfor();
-                  console.log({ userInfo });
+
+                  dispatch({
+                    type: FETCH_USER_INFO,
+                    payload: {
+                      ...userInfo,
+                    },
+                  });
                   onResetAll();
                 }
               })
@@ -347,6 +354,9 @@ const ChanelPage: React.FC<Props> = (props) => {
     },
     [loginData, formState]
   );
+  useEffect(() => {
+    dispatch(getUserInfo());
+  }, []);
   return (
     <div className="page">
       <div className="inner-page">

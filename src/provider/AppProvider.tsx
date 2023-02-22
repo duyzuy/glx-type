@@ -9,13 +9,13 @@ import {
 } from "../constants/actions";
 import client from "../api/client";
 
-import { StorageKEY, ReducerKeys } from "../models";
+import { StorageKEY } from "../models";
 import { logger } from "../hooks/logger";
 const AppProvider: React.FC<{ children: React.ReactNode }> = (props) => {
   const [state, dispatch] = useReducer(logger(rootReducer), initialState);
   const deviceInfor = useDevice();
 
-  //fetchDevice
+  //FetchDevice
   const fetchDeviceInfo = async () => {
     let data = { token: "", ipAddress: "" };
     const bodyParams = {
