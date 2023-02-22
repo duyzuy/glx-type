@@ -1,6 +1,6 @@
 import React, { memo, useMemo } from "react";
 import "./style.scss";
-
+import * as Icon from "react-feather";
 const Input: React.FC<{
   name?: string;
   type?: string;
@@ -10,6 +10,7 @@ const Input: React.FC<{
   value?: string | number | undefined;
   maxLength?: number;
   error?: string;
+  isValid?: boolean;
   className?: string;
 }> = (props) => {
   const {
@@ -21,6 +22,7 @@ const Input: React.FC<{
     value,
     error,
     className,
+    isValid,
     ...rest
   } = props;
 
@@ -28,19 +30,31 @@ const Input: React.FC<{
     let cls = "field";
     if (error) cls = cls.concat(" ", "error");
     if (className) cls = cls.concat(" ", className);
-
+    if (isValid) cls = cls.concat(" ", "isValid");
     return cls;
-  }, [error, className]);
+  }, [error, className, isValid]);
   return (
     <div className={classes}>
-      <input
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        onChange={onChange}
-        onKeyUp={onKeyUp}
-        value={value}
-      />
+      <div className="input">
+        <input
+          name={name}
+          type={type}
+          placeholder={placeholder}
+          onChange={onChange}
+          onKeyUp={onKeyUp}
+          value={value}
+        />
+        {(error && (
+          <span className="icon">
+            <Icon.AlertTriangle size={16} />
+          </span>
+        )) || <></>}
+        {(isValid && (
+          <span className="icon">
+            <Icon.CheckCircle size={16} />
+          </span>
+        )) || <></>}
+      </div>
       {(error && <p className="error-message">{error}</p>) || <></>}
     </div>
   );

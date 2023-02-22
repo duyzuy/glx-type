@@ -3,29 +3,46 @@ import "./style.scss";
 
 const Button: React.FC<{
   onClick?: () => void;
-  size?: string;
+  size?: "large" | "medium" | "small";
   color?: string;
   children?: JSX.Element | string;
   className?: string;
-  type?: string;
+  type?: "button" | "submit" | "reset";
+  variant?: "text" | "filled" | "outlined";
 }> = (props) => {
-  const { onClick, size, color, children, className, ...rest } = props;
+  const {
+    onClick,
+    size = "medium",
+    color,
+    children,
+    className,
+    variant = "filled",
+    type = "button",
+    ...rest
+  } = props;
   const classes = useMemo(() => {
     let clss = "btn";
     if (className) {
-      clss = clss.concat(" ", clss);
+      clss = clss.concat(" ", className);
     }
+
     if (color) {
       if (color === "primary" || color === "secondary") {
         clss = clss.concat(" ", color);
       }
     }
+    if (variant) {
+      clss = clss.concat(" ", variant);
+    }
+    if (size) {
+      clss = clss.concat(" ", size);
+    }
 
     return clss;
-  }, [className, color]);
+  }, [className, color, variant, size]);
 
   return (
-    <button className={classes} onClick={onClick}>
+    <button type={type} className={classes} onClick={onClick}>
       {props.children}
     </button>
   );

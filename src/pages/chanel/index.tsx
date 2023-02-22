@@ -9,16 +9,27 @@ import Modal from "../../components/Modal";
 import ModalContent from "./components/ModalContent";
 import { loginSchema } from "../../utils/validator";
 import * as yup from "yup";
-
+import { StorageKEY } from "../../models";
+import { FETCH_CAMPAIGN_INFOR, FETCH_USER_INFO } from "../../constants/actions";
+import { useDispatch } from "../../provider/hooks";
 interface Props {
   children?: JSX.Element;
 }
-
+enum RegisterKeys {
+  phoneNumber = "phoneNumber",
+  otpCode = "otpCode",
+  password = "password",
+  nextAction = "nextAction",
+  token = "token",
+  rfToken = "rfToken",
+}
 interface FormRegister {
-  phoneNumber: string;
-  otpCode: string;
-  password: string;
-  nextAction: LoginActions;
+  [RegisterKeys.phoneNumber]: string;
+  [RegisterKeys.password]: string;
+  [RegisterKeys.otpCode]: string;
+  [RegisterKeys.token]: string;
+  [RegisterKeys.rfToken]: string;
+  [RegisterKeys.nextAction]: LoginActions;
 }
 enum LoginActions {
   CheckAccount = "CheckAccount",
@@ -29,11 +40,13 @@ enum LoginActions {
 }
 const ChanelPage: React.FC<Props> = (props) => {
   const { chanelType } = useParams();
-
+  const dispatch = useDispatch();
   const [loginData, setLoginData] = useState<FormRegister>({
     phoneNumber: "",
     otpCode: "",
     password: "",
+    token: "",
+    rfToken: "",
     nextAction: LoginActions.CheckAccount,
   });
   const [formState, setFormState] = useState<{
@@ -45,11 +58,33 @@ const ChanelPage: React.FC<Props> = (props) => {
     isShowOTP: false,
     isShowModal: false,
   });
-  const [errors, setErrors] = useState<
-    Partial<Pick<FormRegister, "phoneNumber" | "otpCode" | "password">>
-  >({});
+  const [errors, setErrors] = useState<{
+    [RegisterKeys.phoneNumber]?: string;
+    [RegisterKeys.password]?: string;
+    [RegisterKeys.otpCode]?: string;
+  }>({});
 
+  const onResetAll = () => {
+    setLoginData((prevState) => ({
+      ...prevState,
+      password: "",
+      otpCode: "",
+      token: "",
+      rfToken: "",
+      nextAction: LoginActions.CheckAccount,
+    }));
+    setFormState({
+      isShowPassword: false,
+      isShowOTP: false,
+      isShowModal: false,
+    });
+    setErrors({});
+  };
   const onChange = (key: string, value: string) => {
+    console.log(key);
+    if (key === RegisterKeys.phoneNumber) {
+      onResetAll();
+    }
     setLoginData((prevState) => ({
       ...prevState,
       [key]: value,
@@ -64,25 +99,22 @@ const ChanelPage: React.FC<Props> = (props) => {
             { phoneNumber: loginData.phoneNumber },
             { abortEarly: false }
           )
-          .then(async (data) => {
+          .then(async (dataSchema) => {
             const checkAccount = await loginApi.checkAccount({
-              phone: data.phoneNumber,
+              phone: dataSchema.phoneNumber,
             });
             if (checkAccount.code === 0) {
               /**
                * is Registed
                * Next:
                * Check Promotions
-               *
-               * Show password field
+               * Show password field (if valid)
                * Take user do the login action
-               * #
-               * Show popup Modal;
-               * Take user do the login with another phone number
+               * Show popup Modal (no valid)
                */
 
               const getOffer = await loginApi.getOffer({
-                phone: loginData.phoneNumber,
+                phone: dataSchema.phoneNumber,
               });
               if (getOffer.error === 0 && getOffer.data.promotions) {
                 //show password field
@@ -91,11 +123,10 @@ const ChanelPage: React.FC<Props> = (props) => {
                   isShowOTP: false,
                   isShowPassword: true,
                 }));
-                setLoginData((prevState) => ({
-                  ...prevState,
+                setLoginData((formData) => ({
+                  ...formData,
                   nextAction: LoginActions.Login,
                 }));
-                return;
               } else {
                 //Show popup Modal
                 setFormState(() => ({
@@ -103,8 +134,8 @@ const ChanelPage: React.FC<Props> = (props) => {
                   isShowOTP: false,
                   isShowPassword: false,
                 }));
-                return;
               }
+              setErrors({});
             }
             if (checkAccount.code === 1) {
               /**
@@ -113,16 +144,25 @@ const ChanelPage: React.FC<Props> = (props) => {
                * Send OTP code then show OTP field
                * Take user do the verify OTP action
                */
-              setFormState(() => ({
-                isShowModal: false,
-                isShowOTP: true,
-                isShowPassword: false,
-              }));
-              setLoginData((prevState) => ({
-                ...prevState,
-                nextAction: LoginActions.VerifyOTP,
-              }));
-              return;
+              const response = await loginApi.verifyPhoneNumber(
+                dataSchema.phoneNumber
+              );
+              if (response.statusCode === 400) {
+                setErrors(() => ({
+                  phoneNumber: response.message,
+                }));
+              } else {
+                setFormState(() => ({
+                  isShowModal: false,
+                  isShowOTP: true,
+                  isShowPassword: false,
+                }));
+                setErrors({});
+                setLoginData((prevState) => ({
+                  ...prevState,
+                  nextAction: LoginActions.VerifyOTP,
+                }));
+              }
             }
           })
           .catch((errors) => {
@@ -142,20 +182,158 @@ const ChanelPage: React.FC<Props> = (props) => {
       } else {
         switch (loginData.nextAction) {
           case LoginActions.VerifyOTP: {
-            const response = await loginApi.createAccount({
-              phone: loginData.phoneNumber,
-              code: loginData.otpCode,
-            });
-            console.log({ response });
-            if (response.data.statusCode === 400) {
-            } else {
-            }
+            loginSchema
+              .validate(
+                {
+                  phoneNumber: loginData.phoneNumber,
+                  otpCode: loginData.otpCode,
+                },
+                {
+                  abortEarly: false,
+                }
+              )
+              .then(async (dataSchema) => {
+                const response = await loginApi.createAccount({
+                  phone: dataSchema.phoneNumber,
+                  code: dataSchema.otpCode,
+                });
+
+                if (response.data.statusCode === 400) {
+                  setErrors(() => ({
+                    otpCode: response.data.message,
+                  }));
+                } else {
+                  setFormState((formState) => ({
+                    ...formState,
+                    isShowOTP: false,
+                    isShowPassword: true,
+                  }));
+                  setErrors({});
+                  setLoginData((formData) => ({
+                    ...formData,
+                    token: response.token,
+                    rfToken: response.rfToken,
+                    nextAction: LoginActions.CreatePassword,
+                  }));
+                }
+              })
+              .catch((errors) => {
+                if (errors instanceof yup.ValidationError) {
+                  const errorMessage = errors.inner.reduce(
+                    (acc: object, current: any) => {
+                      return {
+                        ...acc,
+                        [current.path]: current.message,
+                      };
+                    },
+                    {}
+                  );
+                  setErrors(errorMessage);
+                }
+              });
             break;
           }
           case LoginActions.CreatePassword: {
+            loginSchema
+              .validate(
+                {
+                  phoneNumber: loginData.phoneNumber,
+                  password: loginData.password,
+                  isLogin: true,
+                },
+                {
+                  abortEarly: false,
+                }
+              )
+              .then(async (dataSchema) => {
+                const response = await loginApi.createPassword({
+                  password: dataSchema.password || "",
+                  token: loginData.token,
+                });
+                //save token if create password success
+
+                localStorage.setItem(StorageKEY.authToken, loginData.token);
+                localStorage.setItem(
+                  StorageKEY.refreshToken,
+                  loginData.rfToken
+                );
+
+                const userInfo = await loginApi.getUserInfor();
+                dispatch({
+                  type: FETCH_USER_INFO,
+                  payload: {
+                    ...userInfo,
+                  },
+                });
+
+                //fetch userinfo
+              })
+              .catch((errors) => {
+                if (errors instanceof yup.ValidationError) {
+                  const errorMessage = errors.inner.reduce(
+                    (acc: object, current: any) => {
+                      return {
+                        ...acc,
+                        [current.path]: current.message,
+                      };
+                    },
+                    {}
+                  );
+                  setErrors(errorMessage);
+                }
+              });
             break;
           }
-          case LoginActions.ForgotPassword: {
+          case LoginActions.Login: {
+            loginSchema
+              .validate(
+                {
+                  phoneNumber: loginData.phoneNumber,
+                  password: loginData.password,
+                  isLogin: true,
+                },
+                {
+                  abortEarly: false,
+                }
+              )
+              .then(async (dataSchema) => {
+                const response = await loginApi.makeLogin({
+                  phone: dataSchema.phoneNumber,
+                  password: dataSchema.password,
+                });
+
+                console.log({ response });
+                if (response.data.statusCode === 400) {
+                  setErrors(() => ({
+                    password: response.data.message,
+                  }));
+                } else if (response.data.Status === 1) {
+                  //login success
+
+                  localStorage.setItem(StorageKEY.authToken, response.token);
+                  localStorage.setItem(
+                    StorageKEY.refreshToken,
+                    response.rfToken
+                  );
+                  const userInfo = await loginApi.getUserInfor();
+                  console.log({ userInfo });
+                  onResetAll();
+                }
+              })
+              .catch((errors) => {
+                if (errors instanceof yup.ValidationError) {
+                  const errorMessage = errors.inner.reduce(
+                    (acc: object, current: any) => {
+                      return {
+                        ...acc,
+                        [current.path]: current.message,
+                      };
+                    },
+                    {}
+                  );
+                  setErrors(errorMessage);
+                }
+              });
             break;
           }
           case LoginActions.ForgotPassword: {
@@ -226,11 +404,8 @@ const ChanelPage: React.FC<Props> = (props) => {
                           value={loginData.phoneNumber}
                           maxLength={10}
                           onChange={(e) =>
-                            onChange("phoneNumber", e.target.value)
+                            onChange(RegisterKeys.phoneNumber, e.target.value)
                           }
-                          onKeyUp={(e) => {
-                            console.log(e.key);
-                          }}
                           error={errors.phoneNumber}
                         />
                         {(formState.isShowPassword && (
@@ -243,15 +418,15 @@ const ChanelPage: React.FC<Props> = (props) => {
                                 maxLength={10}
                                 type="password"
                                 onChange={(e) =>
-                                  onChange("password", e.target.value)
+                                  onChange(
+                                    RegisterKeys.password,
+                                    e.target.value
+                                  )
                                 }
-                                onKeyUp={(e) => {
-                                  console.log(e.key);
-                                }}
                                 error={errors.password}
                               />
                               <div className="forgot">
-                                <button>Quên mật khẩu</button>
+                                <Button variant="text">Quên mật khẩu?</Button>
                               </div>
                             </div>
                           </>
@@ -264,15 +439,12 @@ const ChanelPage: React.FC<Props> = (props) => {
                             maxLength={10}
                             type="password"
                             onChange={(e) =>
-                              onChange("otpCode", e.target.value)
+                              onChange(RegisterKeys.otpCode, e.target.value)
                             }
-                            onKeyUp={(e) => {
-                              console.log(e.key);
-                            }}
-                            error={"asdf"}
+                            error={errors.otpCode}
                           />
                         )) || <></>}
-                        <Button type="button" color="primary">
+                        <Button type="submit" color="primary">
                           Tiếp tục
                         </Button>
                       </form>

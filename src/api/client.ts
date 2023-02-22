@@ -3,6 +3,18 @@ interface Options {
   headers?: object;
   method: string;
 }
+
+// const { fetch: originalFetch } = window;
+// //interceptor fetch api
+// window.fetch = async (...args) => {
+//   let [resource, config] = args;
+
+//   // request interceptor here
+//   const response = await originalFetch(resource, config);
+//   // response interceptor here
+//   return response;
+// };
+
 const client = async (input: string, { body, headers, method }: Options) => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const token = localStorage.getItem("glx-token-device") || "";

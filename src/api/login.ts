@@ -8,7 +8,12 @@ interface AccountInfo {
 }
 
 export const loginApi = {
-  checkAccount: async ({ phone }: Pick<AccountInfo, "phone">) => {
+  checkAccount: async ({
+    phone,
+  }: Pick<AccountInfo, "phone">): Promise<{
+    code: number;
+    message: string;
+  }> => {
     const response = await client.get(`account/phone/check/${phone}`, {
       headers: {
         "access-token": localStorage.getItem(StorageKEY.deviceToken) || "",
@@ -16,7 +21,7 @@ export const loginApi = {
     });
     return response.data;
   },
-  verifyPhoneNumber: async (phone: Pick<AccountInfo, "phone">) => {
+  verifyPhoneNumber: async (phone: string) => {
     const response = await client.post(`account/phone/verify?phone=${phone}`, {
       body: {
         phone: phone,
@@ -46,44 +51,37 @@ export const loginApi = {
     phone,
     code,
   }: Pick<AccountInfo, "phone" | "code">) => {
-    let bodyData: Pick<AccountInfo, "phone" | "code"> = { phone };
+    let bodyData: Pick<AccountInfo, "phone" | "code"> = { phone, code };
 
-    let URL = `account/phone/register?phone=${phone}`;
+    const response = await client.post(
+      `account/phone/register?phone=${phone}&code=${code}`,
+      {
+        headers: {
+          "access-token": localStorage.getItem(StorageKEY.deviceToken) || "",
+        },
+        body: { ...bodyData },
+      }
+    );
+    const authToken = response.headers.get("x-fim-atoken") || "";
+    const authRfToken = response.headers.get("x-fim-rtoken") || "";
 
-    if (code) {
-      URL = URL.concat(`&code=${code}`);
-      bodyData = {
-        ...bodyData,
-        code,
-      };
-    }
-
-    const response = await client.post(URL, {
-      headers: {
-        "access-token": localStorage.getItem(StorageKEY.deviceToken) || "",
-      },
-      body: bodyData,
-    });
-    if (response.status === 200) {
-      const authToken = response.headers.get("x-fim-atoken");
-      const authRfToken = response.headers.get("x-fim-rtoken");
-
-      return {
-        data: response.data,
-        token: authToken,
-        rfToken: authRfToken,
-      };
-    } else {
-      return {
-        data: response.data,
-      };
-    }
+    return {
+      data: response.data,
+      token: authToken,
+      rfToken: authRfToken,
+    };
   },
 
-  updatePassword: async (password: Pick<AccountInfo, "password">) => {
+  createPassword: async ({
+    password,
+    token,
+  }: {
+    password: string;
+    token: string;
+  }) => {
     const response = await client.post(`account/update`, {
       headers: {
-        "access-token": localStorage.getItem(StorageKEY.deviceToken) || "",
+        "access-token": token,
       },
       body: {
         newPassword: password,
@@ -92,55 +90,66 @@ export const loginApi = {
 
     return response.data;
   },
+
+  forgotPassword: async ({ phone }: Pick<AccountInfo, "phone">) => {
+    return await client.post(`account/phone/forgot?phone=${phone}`, {
+      body: { phone },
+    });
+  },
+
+  makeLogin: async ({
+    phone,
+    password,
+    code,
+  }: {
+    phone: string;
+    password?: string;
+    code?: string;
+  }) => {
+    let bodyData: { phone: string; code?: string; password?: string } = {
+      phone,
+    };
+
+    let BASE_URL = `account/login?phone=${phone}`;
+    if (code) {
+      BASE_URL = BASE_URL.concat(`&code=${code}`);
+      bodyData = {
+        ...bodyData,
+        code: code,
+      };
+    }
+    if (password) {
+      bodyData = {
+        ...bodyData,
+        password: password,
+      };
+    }
+
+    const response = await client.post(BASE_URL, {
+      body: {
+        ...bodyData,
+      },
+      headers: {
+        "access-token": localStorage.getItem(StorageKEY.deviceToken),
+      },
+    });
+    const authToken = response.headers.get("x-fim-atoken") || "";
+    const authRfToken = response.headers.get("x-fim-rtoken") || "";
+
+    return {
+      data: response.data,
+      token: authToken,
+      rfToken: authRfToken,
+    };
+  },
+
+  getUserInfor: async (token?: string) => {
+    const response = await client.get(`account/info`, {
+      headers: {
+        "access-token": localStorage.getItem(StorageKEY.authToken),
+      },
+    });
+
+    return response.data;
+  },
 };
-
-// export const forgotPassword = async ({ phone }: Pick<AccountInfo, "phone">) => {
-//   return await client.post(`account/phone/forgot?phone=${phone}`, {
-//     body: { phone },
-//   });
-// };
-
-// export const loginAccount = async ({ phone, code, password }: AccountInfo) => {
-//   let bodyData: { phone: number; code?: number; password?: string } = {
-//     phone: phone,
-//   };
-
-//   let BASE_URL = `/account/login?phone=${phone}`;
-//   if (code) {
-//     BASE_URL = BASE_URL.concat(`&code=${code}`);
-//     bodyData = {
-//       ...bodyData,
-//       code: code,
-//     };
-//   }
-//   if (password) {
-//     bodyData = {
-//       ...bodyData,
-//       password: password,
-//     };
-//   }
-
-//   const response = await client.post(BASE_URL, {
-//     body: bodyData,
-//   });
-//   const authToken = response.headers.get("x-fim-atoken");
-//   const authRfToken = response.headers.get("x-fim-rtoken");
-
-//   return {
-//     data: response.data,
-//     token: authToken,
-//     rfToken: authRfToken,
-//   };
-// };
-
-// export const getUserInfor = async () => {
-//   const authToken = localStorage.getItem("glx-auth-token") || "";
-
-//   const response = await client.get(`account/info`, {
-//     headers: {
-//       "access-token": authToken,
-//     },
-//   });
-
-//   return response.data;
-// };

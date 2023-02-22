@@ -7,6 +7,10 @@
   line-height: 1.2;
   font-family: "GLX-Lato";
   cursor: pointer;
+  &.text {
+    background-color: transparent;
+    border: none;
+  }
   &.primary {
     background-color: #004688;
     border-color: #004688;
