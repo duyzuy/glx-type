@@ -146,7 +146,7 @@ export const loginApi = {
   getUserInfor: async (token?: string) => {
     const response = await client.get(`account/info`, {
       headers: {
-        "access-token": localStorage.getItem(StorageKEY.authToken),
+        "access-token": token,
       },
     });
 

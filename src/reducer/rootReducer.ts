@@ -1,5 +1,4 @@
 import { Action } from "../models";
-import userReducer, { userInfoState } from "./user";
 import settingReducer, { settingState } from "./setting";
 import { ReducerKeys } from "../models";
 
@@ -19,10 +18,10 @@ const combineReducer =
 
 const initialState: Record<ReducerKeys, object> = {
   setting: settingState,
-  userInfo: userInfoState,
+  userInfo: {},
 };
 const rootReducer = combineReducer({
-  userInfo: userReducer,
+  userInfo: () => {},
   setting: settingReducer,
 });
 

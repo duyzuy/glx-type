@@ -16,7 +16,7 @@ const settingState: Setting = {
   campaignStatus: { isActive: false },
 };
 
-const settingReducer = (state: Setting, action: Action) => {
+const settingReducer = (state: object | null, action: any) => {
   switch (action.type) {
     case FETCH_DEVICE: {
       return {

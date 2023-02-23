@@ -1,5 +1,4 @@
 export interface UserInfo {
-  phone: string;
-  email: string;
-  createAt: string;
+  token: string;
+  profile: { phone: string; email: string; [key: string]: any };
 }

@@ -17,4 +17,10 @@ export const useDispatch: Function = () => {
   return (cb: any) => dispatch(cb);
 };
 
-export const asyncActions = (action: Function) => {};
+export const createAsyncAction = (
+  actionName: string,
+  action: (params?: any, dispatch?: any) => void
+) => {
+  // const [_, dispatch] = useContext(AppContext);
+  return (params?: any) => action(params, "1");
+};

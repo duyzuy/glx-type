@@ -1,5 +1,7 @@
 import { Outlet, useMatch, Navigate } from "react-router";
 import NotFoundPage from "./notfound";
+import AppComponent from "./AppComponent";
+
 const RootElements = () => {
   const match = useMatch("/:chanelType");
   if (match) {
@@ -9,6 +11,7 @@ const RootElements = () => {
   }
   return (
     <>
+      <AppComponent />
       <Outlet />
     </>
   );

@@ -10,9 +10,16 @@ import ModalContent from "./components/ModalContent";
 import { loginSchema } from "../../utils/validator";
 import * as yup from "yup";
 import { StorageKEY } from "../../models";
-import { FETCH_CAMPAIGN_INFOR, FETCH_USER_INFO } from "../../constants/actions";
-import { useDispatch } from "../../provider/hooks";
-import { getUserInfo } from "./actions";
+
+import { useAppDispatch } from "../../app/hooks";
+import { fetchUserInfo, makeLogin } from "../../reducer/user";
+import {
+  createAccount,
+  fetchOffer,
+  verifyPhoneNumber,
+  createPassword,
+} from "./actions";
+import { fetchChanelName } from "./chanelSlice";
 interface Props {
   children?: JSX.Element;
 }
@@ -41,7 +48,7 @@ enum LoginActions {
 }
 const ChanelPage: React.FC<Props> = (props) => {
   const { chanelType } = useParams();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [loginData, setLoginData] = useState<FormRegister>({
     phoneNumber: "",
     otpCode: "",
@@ -113,10 +120,10 @@ const ChanelPage: React.FC<Props> = (props) => {
                * Take user do the login action
                * Show popup Modal (no valid)
                */
+              const getOffer = await dispatch(
+                fetchOffer({ phone: dataSchema.phoneNumber })
+              ).unwrap();
 
-              const getOffer = await loginApi.getOffer({
-                phone: dataSchema.phoneNumber,
-              });
               if (getOffer.error === 0 && getOffer.data.promotions) {
                 //show password field
                 setFormState(() => ({
@@ -145,9 +152,10 @@ const ChanelPage: React.FC<Props> = (props) => {
                * Send OTP code then show OTP field
                * Take user do the verify OTP action
                */
-              const response = await loginApi.verifyPhoneNumber(
-                dataSchema.phoneNumber
-              );
+
+              const response = await dispatch(
+                verifyPhoneNumber(dataSchema.phoneNumber)
+              ).unwrap();
               if (response.statusCode === 400) {
                 setErrors(() => ({
                   phoneNumber: response.message,
@@ -194,12 +202,14 @@ const ChanelPage: React.FC<Props> = (props) => {
                 }
               )
               .then(async (dataSchema) => {
-                const response = await loginApi.createAccount({
-                  phone: dataSchema.phoneNumber,
-                  code: dataSchema.otpCode,
-                });
+                const response = await dispatch(
+                  createAccount({
+                    phone: dataSchema.phoneNumber,
+                    code: dataSchema.otpCode || "",
+                  })
+                ).unwrap();
 
-                if (response.data.statusCode === 400) {
+                if (response?.data.statusCode === 400) {
                   setErrors(() => ({
                     otpCode: response.data.message,
                   }));
@@ -212,8 +222,8 @@ const ChanelPage: React.FC<Props> = (props) => {
                   setErrors({});
                   setLoginData((formData) => ({
                     ...formData,
-                    token: response.token,
-                    rfToken: response.rfToken,
+                    token: response?.token || "",
+                    rfToken: response?.rfToken || "",
                     nextAction: LoginActions.CreatePassword,
                   }));
                 }
@@ -239,7 +249,7 @@ const ChanelPage: React.FC<Props> = (props) => {
               .validate(
                 {
                   phoneNumber: loginData.phoneNumber,
-                  password: loginData.password,
+                  password: loginData.password || "",
                   isLogin: true,
                 },
                 {
@@ -247,27 +257,23 @@ const ChanelPage: React.FC<Props> = (props) => {
                 }
               )
               .then(async (dataSchema) => {
-                const response = await loginApi.createPassword({
-                  password: dataSchema.password || "",
-                  token: loginData.token,
-                });
+                const response = await dispatch(
+                  createPassword({
+                    password: dataSchema.password || "",
+                    token: loginData.token || "",
+                  })
+                ).unwrap();
                 //save token if create password success
 
-                localStorage.setItem(StorageKEY.authToken, loginData.token);
+                localStorage.setItem(
+                  StorageKEY.authToken,
+                  loginData.token || ""
+                );
                 localStorage.setItem(
                   StorageKEY.refreshToken,
-                  loginData.rfToken
+                  loginData.rfToken || ""
                 );
-
-                const userInfo = await loginApi.getUserInfor();
-                dispatch({
-                  type: FETCH_USER_INFO,
-                  payload: {
-                    ...userInfo,
-                  },
-                });
-
-                //fetch userinfo
+                dispatch(fetchUserInfo(loginData.token));
               })
               .catch((errors) => {
                 if (errors instanceof yup.ValidationError) {
@@ -298,32 +304,20 @@ const ChanelPage: React.FC<Props> = (props) => {
                 }
               )
               .then(async (dataSchema) => {
-                const response = await loginApi.makeLogin({
-                  phone: dataSchema.phoneNumber,
-                  password: dataSchema.password,
-                });
+                const response = await dispatch(
+                  makeLogin({
+                    phone: dataSchema.phoneNumber,
+                    password: dataSchema.password || "",
+                  })
+                ).unwrap();
 
-                console.log({ response });
-                if (response.data.statusCode === 400) {
+                if (response?.data.statusCode === 400) {
                   setErrors(() => ({
                     password: response.data.message,
                   }));
-                } else if (response.data.Status === 1) {
+                } else {
                   //login success
-
-                  localStorage.setItem(StorageKEY.authToken, response.token);
-                  localStorage.setItem(
-                    StorageKEY.refreshToken,
-                    response.rfToken
-                  );
-                  const userInfo = await loginApi.getUserInfor();
-
-                  dispatch({
-                    type: FETCH_USER_INFO,
-                    payload: {
-                      ...userInfo,
-                    },
-                  });
+                  setErrors({});
                   onResetAll();
                 }
               })
@@ -356,8 +350,11 @@ const ChanelPage: React.FC<Props> = (props) => {
   );
   useEffect(() => {
     (async () => {
-      const data = await dispatch(getUserInfo());
-      console.log({ data });
+      const authToken = localStorage.getItem(StorageKEY.authToken) || "";
+      if (authToken) {
+        await dispatch(fetchUserInfo(authToken));
+      }
+      dispatch(fetchChanelName(chanelType));
     })();
   }, []);
   return (

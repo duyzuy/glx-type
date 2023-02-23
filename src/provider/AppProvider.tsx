@@ -11,7 +11,10 @@ import client from "../api/client";
 
 import { StorageKEY } from "../models";
 import { logger } from "../hooks/logger";
-const AppProvider: React.FC<{ children: React.ReactNode }> = (props) => {
+const AppProvider: React.FC<{
+  children: React.ReactNode;
+  [keyName: string]: any;
+}> = (props) => {
   const [state, dispatch] = useReducer(logger(rootReducer), initialState);
   const deviceInfor = useDevice();
 
@@ -82,7 +85,7 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = (props) => {
     (async () => {
       const deviceToken = localStorage.getItem(StorageKEY.deviceToken) || "";
       if (deviceToken) {
-        fetchCampaignInfo({ token: deviceToken });
+        await fetchCampaignInfo({ token: deviceToken });
         dispatch({
           type: FETCH_DEVICE,
           payload: {
