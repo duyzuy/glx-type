@@ -19,6 +19,7 @@ export const fetchDeviceInfo = createAsyncThunk(
     };
     const deviceToken = localStorage.getItem(StorageKEY.deviceToken);
     const ipAddress = localStorage.getItem(StorageKEY.ipAddress) || "";
+
     if (deviceToken) {
       data = {
         token: deviceToken,

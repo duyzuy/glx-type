@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Grid, Image } from "semantic-ui-react";
 
@@ -60,7 +60,8 @@ const ChanelPage: React.FC<Props> = (props) => {
   const isLogedin = useAppSelector((state) => state.userInfo.isLogedin);
   const userData = useAppSelector((state) => state.userInfo.profile);
   const navigate = useNavigate();
-  console.log({ userData });
+  const phoneRef = useRef<HTMLInputElement>(null);
+
   const [loginData, setLoginData] = useState<FormRegister>({
     phoneNumber: "",
     otpCode: "",
@@ -73,11 +74,14 @@ const ChanelPage: React.FC<Props> = (props) => {
     isShowPassword: boolean;
     isShowOTP: boolean;
     isShowModal: boolean;
+    canResendOTP: boolean;
   }>({
     isShowPassword: false,
     isShowOTP: false,
     isShowModal: false,
+    canResendOTP: true,
   });
+  const [counter, setCounter] = useState<number>(0);
   const [errors, setErrors] = useState<{
     [RegisterKeys.phoneNumber]?: string;
     [RegisterKeys.password]?: string;
@@ -87,6 +91,7 @@ const ChanelPage: React.FC<Props> = (props) => {
   const onResetAll = () => {
     setLoginData((prevState) => ({
       ...prevState,
+      phoneNumber: "",
       password: "",
       otpCode: "",
       token: "",
@@ -97,12 +102,16 @@ const ChanelPage: React.FC<Props> = (props) => {
       isShowPassword: false,
       isShowOTP: false,
       isShowModal: false,
+      canResendOTP: true,
     });
     setErrors({});
   };
   const onChange = (key: string, value: string) => {
-    console.log(key);
-    if (key === RegisterKeys.phoneNumber) {
+    if (
+      key === RegisterKeys.phoneNumber &&
+      loginData.nextAction !== LoginActions.CheckAccount
+    ) {
+      console.log("reset");
       onResetAll();
     }
     setLoginData((prevState) => ({
@@ -114,22 +123,40 @@ const ChanelPage: React.FC<Props> = (props) => {
     const response = await dispatch(
       forgotPassword(loginData.phoneNumber)
     ).unwrap();
+    console.log({ response });
 
-    setLoginData((formData) => ({
-      ...formData,
-      password: "",
-      otpCode: "",
-      nextAction: LoginActions.ForgotPassword,
-    }));
-    setFormState(() => ({
-      isShowOTP: true,
-      isShowPassword: false,
-      isShowModal: false,
-    }));
+    if (response.data.statusCode === 400) {
+      toast({ type: "error", message: response.data.message });
+    } else {
+      setLoginData((formData) => ({
+        ...formData,
+        password: "",
+        otpCode: "",
+        nextAction: LoginActions.ForgotPassword,
+      }));
+      setFormState(() => ({
+        isShowOTP: true,
+        isShowPassword: false,
+        isShowModal: false,
+        canResendOTP: false,
+      }));
+      setCounter(response.data.ttlResend);
+    }
   };
-  const onLogout = () => {
-    dispatch(logout());
-  };
+  useEffect(() => {
+    if (counter !== 0) {
+      const timer = setTimeout(() => {
+        setCounter((count) => count - 1);
+        clearTimeout(timer);
+      }, 1000);
+    } else {
+      setFormState((prevState) => ({
+        ...prevState,
+        canResendOTP: true,
+      }));
+    }
+  }, [counter]);
+
   const onHandleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -158,10 +185,10 @@ const ChanelPage: React.FC<Props> = (props) => {
 
               if (getOffer.error === 0 && getOffer.data.promotions) {
                 //show password field
-                setFormState(() => ({
-                  isShowModal: false,
-                  isShowOTP: false,
+                setFormState((prevState) => ({
+                  ...prevState,
                   isShowPassword: true,
+                  isShowOTP: false,
                 }));
                 setLoginData((formData) => ({
                   ...formData,
@@ -169,10 +196,9 @@ const ChanelPage: React.FC<Props> = (props) => {
                 }));
               } else {
                 //Show popup Modal
-                setFormState(() => ({
+                setFormState((prevState) => ({
+                  ...prevState,
                   isShowModal: true,
-                  isShowOTP: false,
-                  isShowPassword: false,
                 }));
               }
               setErrors({});
@@ -193,8 +219,8 @@ const ChanelPage: React.FC<Props> = (props) => {
                   phoneNumber: response.message,
                 }));
               } else {
-                setFormState(() => ({
-                  isShowModal: false,
+                setFormState((prevState) => ({
+                  ...prevState,
                   isShowOTP: true,
                   isShowPassword: false,
                 }));
@@ -390,10 +416,10 @@ const ChanelPage: React.FC<Props> = (props) => {
                 if (response?.data?.statusCode === 400) {
                   console.log(response);
                 } else {
-                  setFormState(() => ({
+                  setFormState((prevState) => ({
+                    ...prevState,
                     isShowPassword: true,
                     isShowOTP: false,
-                    isShowModal: false,
                   }));
                   setLoginData((formData) => ({
                     ...formData,
@@ -429,6 +455,7 @@ const ChanelPage: React.FC<Props> = (props) => {
   );
   useEffect(() => {
     dispatch(fetchChanelName(chanelType));
+    console.log(phoneRef);
   }, []);
   return (
     <div className="page">
@@ -481,6 +508,7 @@ const ChanelPage: React.FC<Props> = (props) => {
                         data={userData}
                         onLogout={() => {
                           dispatch(logout());
+                          onResetAll();
                         }}
                         onContinue={() => navigate("./checkout")}
                       />
@@ -494,6 +522,9 @@ const ChanelPage: React.FC<Props> = (props) => {
                         formState={formState}
                         onChange={onChange}
                         onForgotPassword={onForgotPassword}
+                        counter={counter}
+                        onChangePhoneNumber={onResetAll}
+                        ref={phoneRef}
                       />
                     </>
                   )}

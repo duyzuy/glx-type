@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, forwardRef, ForwardedRef } from "react";
 import { RegisterKeys } from "../../../models";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
@@ -10,8 +10,10 @@ type PropsType = {
   errors: { [key: string]: string };
   onForgotPassword: () => void;
   formState: any;
+  counter?: number;
+  onChangePhoneNumber: () => void;
 };
-const LoginForm: React.FC<PropsType> = (props) => {
+const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
   const {
     onHandleSubmit,
     data,
@@ -19,7 +21,10 @@ const LoginForm: React.FC<PropsType> = (props) => {
     errors,
     onForgotPassword,
     formState,
+    counter,
+    onChangePhoneNumber,
   } = props;
+  console.log({ props });
   return (
     <div className="form login-form">
       <p className="label white center">
@@ -34,6 +39,7 @@ const LoginForm: React.FC<PropsType> = (props) => {
             maxLength={10}
             onChange={(e) => onChange(RegisterKeys.phoneNumber, e.target.value)}
             error={errors.phoneNumber}
+            ref={ref}
           />
           {(formState.isShowPassword && (
             <>
@@ -58,15 +64,37 @@ const LoginForm: React.FC<PropsType> = (props) => {
             </>
           )) || <></>}
           {(formState.isShowOTP && (
-            <Input
-              name="otpCode"
-              placeholder="Nhập mã xác thực"
-              value={data.otpCode}
-              maxLength={10}
-              type="password"
-              onChange={(e) => onChange(RegisterKeys.otpCode, e.target.value)}
-              error={errors.otpCode}
-            />
+            <>
+              <Input
+                name="otpCode"
+                placeholder="Nhập mã xác thực"
+                value={data.otpCode}
+                maxLength={10}
+                type="password"
+                onChange={(e) => onChange(RegisterKeys.otpCode, e.target.value)}
+                error={errors.otpCode}
+              />
+              <div className="otp-options">
+                <div className="otp-resend">
+                  {(formState.canResendOTP && (
+                    <>
+                      <p className="btn-resend white">Gửi lại mã xác nhận</p>
+                    </>
+                  )) || (
+                    <p className="text white">
+                      Gửi lại mã xác nhận sau:{" "}
+                      <span className="count">{`${counter}s`}</span>
+                    </p>
+                  )}
+                </div>
+                <div
+                  className="change-phone white"
+                  onClick={onChangePhoneNumber}
+                >
+                  Đổi số điện thoại
+                </div>
+              </div>
+            </>
           )) || <></>}
           <Button type="submit" color="primary">
             Tiếp tục
@@ -75,5 +103,5 @@ const LoginForm: React.FC<PropsType> = (props) => {
       </div>
     </div>
   );
-};
+});
 export default memo(LoginForm);

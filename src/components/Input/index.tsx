@@ -1,7 +1,8 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useMemo, forwardRef } from "react";
 import "./style.scss";
 import * as Icon from "react-feather";
-const Input: React.FC<{
+
+type InputType = {
   name?: string;
   type?: string;
   placeholder?: string;
@@ -12,7 +13,8 @@ const Input: React.FC<{
   error?: string;
   isValid?: boolean;
   className?: string;
-}> = (props) => {
+};
+const Input = forwardRef<HTMLInputElement, InputType>((props, ref) => {
   const {
     name,
     type,
@@ -43,6 +45,7 @@ const Input: React.FC<{
           onChange={onChange}
           onKeyUp={onKeyUp}
           value={value}
+          ref={ref}
         />
         {(error && (
           <span className="icon">
@@ -58,5 +61,5 @@ const Input: React.FC<{
       {(error && <p className="error-message">{error}</p>) || <></>}
     </div>
   );
-};
+});
 export default memo(Input);

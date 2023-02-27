@@ -12,6 +12,7 @@ const AppComponent = () => {
   useEffect(() => {
     (async () => {
       const device = await dispatch(fetchDeviceInfo(deviceInfor)).unwrap();
+
       await dispatch(fetchCampaignInfo({ token: device.token }));
     })();
   }, []);

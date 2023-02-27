@@ -34,12 +34,19 @@ const logout = createAction("chanel/userLogout", function prepare() {
 const forgotPassword = createAsyncThunk(
   "user/forgotPassowrd",
   async (phone: string) => {
+    let dataResponse: { data: { [key: string]: any } } = { data: {} };
     try {
       const response = await loginApi.forgotPassword({ phone });
-      console.log({ response });
+
+      dataResponse = {
+        ...dataResponse,
+        data: response.data,
+      };
     } catch (error) {
       console.log(error);
     }
+
+    return dataResponse;
   }
 );
 const fetchUserInfo = createAsyncThunk(
@@ -60,11 +67,11 @@ const fetchUserInfo = createAsyncThunk(
         //498 token expired
         //9000 no valid token
         userData.data = response;
-        toast({
-          type: "error",
-          message: response.reason,
-        });
-        // thunkAPI.dispatch(logout());
+        // toast({
+        //   type: "error",
+        //   message: response.reason,
+        // });
+        thunkAPI.dispatch(logout());
       } else {
         //logedin
         userData = {

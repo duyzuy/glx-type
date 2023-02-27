@@ -36,6 +36,17 @@
 
   .login-form {
     padding: 20px;
+    .otp-options {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      .otp-resend,
+      .change-phone {
+        padding: 0 10px;
+        cursor: pointer;
+      }
+    }
+
     .field {
       margin-bottom: 20px;
       input {
