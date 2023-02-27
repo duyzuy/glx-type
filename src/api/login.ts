@@ -94,6 +94,9 @@ export const loginApi = {
   forgotPassword: async ({ phone }: Pick<AccountInfo, "phone">) => {
     return await client.post(`account/phone/forgot?phone=${phone}`, {
       body: { phone },
+      headers: {
+        "access-token": localStorage.getItem(StorageKEY.deviceToken),
+      },
     });
   },
 

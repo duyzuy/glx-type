@@ -1,19 +1,20 @@
 import React, { memo, useMemo } from "react";
 import "./style.scss";
 
-const Button: React.FC<{
+type Buttontype = {
   onClick?: () => void;
   size?: "large" | "medium" | "small";
-  color?: string;
+  color?: "primary" | "secondary" | "default" | "warning" | "info";
   children?: JSX.Element | string;
   className?: string;
   type?: "button" | "submit" | "reset";
   variant?: "text" | "filled" | "outlined";
-}> = (props) => {
+};
+const Button: React.FC<Buttontype> = (props) => {
   const {
     onClick,
     size = "medium",
-    color,
+    color = "default",
     children,
     className,
     variant = "filled",
@@ -27,7 +28,7 @@ const Button: React.FC<{
     }
 
     if (color) {
-      if (color === "primary" || color === "secondary") {
+      if (typeof color as Buttontype["color"]) {
         clss = clss.concat(" ", color);
       }
     }

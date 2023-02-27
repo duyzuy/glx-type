@@ -1,7 +1,7 @@
 import { Outlet, useMatch, Navigate } from "react-router";
 import NotFoundPage from "./notfound";
 import AppComponent from "./AppComponent";
-
+import { Toast } from "../libs/toast";
 const RootElements = () => {
   const match = useMatch("/:chanelType");
   if (match) {
@@ -13,6 +13,7 @@ const RootElements = () => {
     <>
       <AppComponent />
       <Outlet />
+      <Toast />
     </>
   );
 };

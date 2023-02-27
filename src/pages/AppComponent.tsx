@@ -4,6 +4,7 @@ import { StorageKEY } from "../models";
 import useDevice from "../hooks/useDevice";
 import { fetchDeviceInfo, fetchCampaignInfo } from "./chanel/actions";
 import { useAppDispatch } from "../app/hooks";
+import { fetchUserInfo } from "../reducer/user";
 const AppComponent = () => {
   const deviceInfor = useDevice();
   const dispatch = useAppDispatch();
@@ -15,7 +16,14 @@ const AppComponent = () => {
     })();
   }, []);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    (async () => {
+      const authToken = localStorage.getItem(StorageKEY.authToken) || "";
+      if (authToken) {
+        await dispatch(fetchUserInfo(authToken));
+      }
+    })();
+  }, []);
 
   return <></>;
 };

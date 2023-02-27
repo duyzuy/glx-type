@@ -1,8 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Grid, Image } from "semantic-ui-react";
-import Input from "../../components/Input";
-import Button from "../../components/Button";
+
 import { loginApi } from "../../api/login";
 import "./style.scss";
 import Modal from "../../components/Modal";
@@ -10,9 +9,17 @@ import ModalContent from "./components/ModalContent";
 import { loginSchema } from "../../utils/validator";
 import * as yup from "yup";
 import { StorageKEY } from "../../models";
-
-import { useAppDispatch } from "../../app/hooks";
-import { fetchUserInfo, makeLogin } from "../../reducer/user";
+import { toast } from "../../libs/toast";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import LoginForm from "./components/LoginForm";
+import UserProfile from "./components/UserProfile";
+import {
+  fetchUserInfo,
+  makeLogin,
+  forgotPassword,
+  loginWithOtpCode,
+  logout,
+} from "../../reducer/user";
 import {
   createAccount,
   fetchOffer,
@@ -20,6 +27,7 @@ import {
   createPassword,
 } from "./actions";
 import { fetchChanelName } from "./chanelSlice";
+import { useNavigate } from "react-router-dom";
 interface Props {
   children?: JSX.Element;
 }
@@ -49,6 +57,10 @@ enum LoginActions {
 const ChanelPage: React.FC<Props> = (props) => {
   const { chanelType } = useParams();
   const dispatch = useAppDispatch();
+  const isLogedin = useAppSelector((state) => state.userInfo.isLogedin);
+  const userData = useAppSelector((state) => state.userInfo.profile);
+  const navigate = useNavigate();
+  console.log({ userData });
   const [loginData, setLoginData] = useState<FormRegister>({
     phoneNumber: "",
     otpCode: "",
@@ -97,6 +109,26 @@ const ChanelPage: React.FC<Props> = (props) => {
       ...prevState,
       [key]: value,
     }));
+  };
+  const onForgotPassword = async () => {
+    const response = await dispatch(
+      forgotPassword(loginData.phoneNumber)
+    ).unwrap();
+
+    setLoginData((formData) => ({
+      ...formData,
+      password: "",
+      otpCode: "",
+      nextAction: LoginActions.ForgotPassword,
+    }));
+    setFormState(() => ({
+      isShowOTP: true,
+      isShowPassword: false,
+      isShowModal: false,
+    }));
+  };
+  const onLogout = () => {
+    dispatch(logout());
   };
   const onHandleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -311,9 +343,9 @@ const ChanelPage: React.FC<Props> = (props) => {
                   })
                 ).unwrap();
 
-                if (response?.data.statusCode === 400) {
+                if (response?.data?.statusCode === 400) {
                   setErrors(() => ({
-                    password: response.data.message,
+                    password: response?.data?.message,
                   }));
                 } else {
                   //login success
@@ -338,9 +370,56 @@ const ChanelPage: React.FC<Props> = (props) => {
             break;
           }
           case LoginActions.ForgotPassword: {
-            break;
-          }
-          case LoginActions.ForgotPassword: {
+            loginSchema
+              .validate(
+                {
+                  phoneNumber: loginData.phoneNumber,
+                  otpCode: loginData.otpCode,
+                  isVerifyAccount: true,
+                },
+                { abortEarly: false }
+              )
+              .then(async (dataSchema) => {
+                const response = await dispatch(
+                  loginWithOtpCode({
+                    phone: dataSchema.phoneNumber,
+                    code: dataSchema.otpCode || "",
+                  })
+                ).unwrap();
+
+                if (response?.data?.statusCode === 400) {
+                  console.log(response);
+                } else {
+                  setFormState(() => ({
+                    isShowPassword: true,
+                    isShowOTP: false,
+                    isShowModal: false,
+                  }));
+                  setLoginData((formData) => ({
+                    ...formData,
+                    password: "",
+                    otpCode: "",
+                    token: response.token,
+                    nextAction: LoginActions.CreatePassword,
+                  }));
+                  setErrors({});
+                }
+              })
+              .catch((errors) => {
+                if (errors instanceof yup.ValidationError) {
+                  const errorMessage = errors.inner.reduce(
+                    (acc: object, current: any) => {
+                      return {
+                        ...acc,
+                        [current.path]: current.message,
+                      };
+                    },
+                    {}
+                  );
+                  setErrors(errorMessage);
+                }
+              });
+
             break;
           }
         }
@@ -349,13 +428,7 @@ const ChanelPage: React.FC<Props> = (props) => {
     [loginData, formState]
   );
   useEffect(() => {
-    (async () => {
-      const authToken = localStorage.getItem(StorageKEY.authToken) || "";
-      if (authToken) {
-        await dispatch(fetchUserInfo(authToken));
-      }
-      dispatch(fetchChanelName(chanelType));
-    })();
+    dispatch(fetchChanelName(chanelType));
   }, []);
   return (
     <div className="page">
@@ -402,64 +475,28 @@ const ChanelPage: React.FC<Props> = (props) => {
                       className="logo"
                     />
                   </div>
-                  <p className="label white center">
-                    Vui lòng nhập "SỐ ĐIỆN THOẠI" và nhấn "TIẾP TỤC"
-                  </p>
-                  <div className="form login-form">
-                    <div className="form-inner">
-                      <form onSubmit={onHandleSubmit}>
-                        <Input
-                          name="phoneNumber"
-                          placeholder="Nhập số điện thoại"
-                          value={loginData.phoneNumber}
-                          maxLength={10}
-                          onChange={(e) =>
-                            onChange(RegisterKeys.phoneNumber, e.target.value)
-                          }
-                          error={errors.phoneNumber}
-                        />
-                        {(formState.isShowPassword && (
-                          <>
-                            <div className="password-fields">
-                              <Input
-                                name="password"
-                                placeholder="Nhập mật khẩu"
-                                value={loginData.password}
-                                maxLength={10}
-                                type="password"
-                                onChange={(e) =>
-                                  onChange(
-                                    RegisterKeys.password,
-                                    e.target.value
-                                  )
-                                }
-                                error={errors.password}
-                              />
-                              <div className="forgot">
-                                <Button variant="text">Quên mật khẩu?</Button>
-                              </div>
-                            </div>
-                          </>
-                        )) || <></>}
-                        {(formState.isShowOTP && (
-                          <Input
-                            name="otpCode"
-                            placeholder="Nhập mã xác thực"
-                            value={loginData.otpCode}
-                            maxLength={10}
-                            type="password"
-                            onChange={(e) =>
-                              onChange(RegisterKeys.otpCode, e.target.value)
-                            }
-                            error={errors.otpCode}
-                          />
-                        )) || <></>}
-                        <Button type="submit" color="primary">
-                          Tiếp tục
-                        </Button>
-                      </form>
-                    </div>
-                  </div>
+                  {(isLogedin && (
+                    <>
+                      <UserProfile
+                        data={userData}
+                        onLogout={() => {
+                          dispatch(logout());
+                        }}
+                        onContinue={() => navigate("./checkout")}
+                      />
+                    </>
+                  )) || (
+                    <>
+                      <LoginForm
+                        onHandleSubmit={onHandleSubmit}
+                        data={loginData}
+                        errors={errors}
+                        formState={formState}
+                        onChange={onChange}
+                        onForgotPassword={onForgotPassword}
+                      />
+                    </>
+                  )}
                 </div>
               </Grid.Column>
             </Grid>
