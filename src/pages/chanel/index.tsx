@@ -514,7 +514,7 @@ const ChanelPage: React.FC<Props> = (props) => {
                 className="image-column"
               >
                 <Image
-                  src={`${process.env.PUBLIC_URL}/images/zalo/image-promotion-top.png`}
+                  src={`${process.env.PUBLIC_URL}/images/${chanelType}/channel-left.png`}
                   alt=""
                 />
               </Grid.Column>
@@ -527,7 +527,7 @@ const ChanelPage: React.FC<Props> = (props) => {
                 <div className="inner-column">
                   <div className="glx-section center">
                     <Image
-                      src={`${process.env.PUBLIC_URL}/images/zalo/logo-glx-white.svg`}
+                      src={`${process.env.PUBLIC_URL}/images/${chanelType}/logo-glx-white.svg`}
                       alt="Galaxy play logo"
                       className="logo"
                     />
@@ -541,7 +541,7 @@ const ChanelPage: React.FC<Props> = (props) => {
                       <span>dành cho khách hàng</span>
                     </p>
                     <Image
-                      src={`${process.env.PUBLIC_URL}/images/zalo/logo-zlpay.png`}
+                      src={`${process.env.PUBLIC_URL}/images/${chanelType}/logo-partner.png`}
                       alt="zaloPay logo"
                       className="logo"
                     />

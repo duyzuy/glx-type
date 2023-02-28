@@ -5,6 +5,9 @@
   }
   &.zalo {
   }
+  .section-content {
+    margin-bottom: 30px;
+  }
   .section-chanel {
     min-height: 100vh;
     display: flex;
@@ -31,6 +34,7 @@
     }
     .logo {
       max-width: 240px;
+      border-radius: 20px;
     }
   }
 
@@ -120,5 +124,76 @@
         margin-left: 20px;
       }
     }
+  }
+}
+.commbo-list {
+  display: flex;
+  justify-content: center;
+}
+.combo-item {
+  width: 280px;
+  padding-left: 15px;
+  padding-right: 15px;
+  &.premium {
+    .box-content {
+      background: rgb(103 58 183 / 15%);
+      color: #673ab7;
+    }
+    .price {
+      color: #673ab7;
+    }
+    button {
+      color: #fff;
+      background: #673ab7;
+    }
+  }
+  &.platinum {
+    .box-content {
+      background: rgb(255 87 34 / 15%);
+      color: #ff5722;
+    }
+    .price {
+      color: #ff5722;
+    }
+    button {
+      color: #fff;
+      background: #ff5722;
+    }
+  }
+  .box-content {
+    padding: 10px 0;
+    border-radius: 10px;
+  }
+  .inner-item {
+    text-align: center;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  .type {
+    font-weight: bold;
+    margin-bottom: 0;
+  }
+  .month {
+    font-size: 30px;
+    text-transform: uppercase;
+    font-family: "GLX-LatoBlack";
+  }
+  .name {
+    margin-bottom: 0;
+  }
+  .combo {
+    font-size: 30px;
+    font-family: "GLX-LatoBlack";
+  }
+  .box-price {
+    padding: 20px;
+  }
+  .price {
+    font-size: 30px;
+    font-family: "GLX-LatoBlack";
+  }
+  button {
+    width: 100%;
   }
 }

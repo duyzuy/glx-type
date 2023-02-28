@@ -1,48 +1,41 @@
 import { memo, useMemo, useState } from "react";
 
 import Button from "../../../components/Button";
-
-const TYPE = {
-  PREMIUM: "premium",
-  PLATINUM: "platinum",
-};
-const COMBOKEY = {
-  TWOD: "2d",
-  THIRD: "3d",
-};
+import { TicketKeys, TicketType } from "../../../models";
+import { formatPrice } from "../../../utils/common";
+import { ComboItemType } from "../../../models";
 interface PropType {
   data: any;
-  onSelect: any;
-  comboType: any;
-  cinemaId: any;
-  active: boolean;
+  onSelect: (data: ComboItemType) => void;
+  ticketType: string;
+  cinemaId: string;
+  active?: boolean;
 }
 const ComboItem: React.FC<PropType> = ({
   data,
   onSelect,
-  comboType,
+  ticketType,
   cinemaId,
   active,
 }) => {
-  // console.log({ data, onSelect, comboType, cinemaId, active });
-  //   const isSelecting = useMemo(() => {
-  //     if (
-  //       active?.data?.type === data.type &&
-  //       active?.comboType === comboType &&
-  //       cinemaId === active.cinemaId
-  //     ) {
-  //       return true;
-  //     }
-  //     return false;
-  //   }, [active, comboType, data, cinemaId]);
+  const classes = useMemo(() => {
+    let cls = "combo-item";
+
+    if (data.type) {
+      cls = cls.concat(" ", data.type);
+    }
+    return cls;
+  }, [data]);
   return (
-    <div className="combo-item">
-      <div className="item-inner">
+    <div className={classes}>
+      <div className="inner-item">
         <div className="box-content">
           <div className="content top">
             <div className="content-inner">
               <p className="type">
-                {data.type === TYPE.PREMIUM ? "Gói cao cấp" : "Gói siêu việt"}
+                {data.type === TicketType.Premium
+                  ? "Gói cao cấp"
+                  : "Gói siêu việt"}
               </p>
               <p className="month">1 tháng</p>
             </div>
@@ -50,19 +43,23 @@ const ComboItem: React.FC<PropType> = ({
           <span className="and">&</span>
           <div className="content second">
             <div className="content-inner">
-              <p className="title">Vé xem phim</p>
+              <p className="name">Vé xem phim</p>
               <p className="combo">
-                {comboType === COMBOKEY.TWOD ? "2D" : "3D"}
+                {ticketType === TicketKeys.Two ? "2D" : "3D"}
               </p>
             </div>
           </div>
         </div>
+        <div className="box-price">
+          <p className="price">{formatPrice(data.price)}</p>
+        </div>
         <Button
+          color="secondary"
           onClick={() => {
-            onSelect({ comboType, data: data, cinemaId });
+            onSelect({ cinemaId, ...data, ticketType });
           }}
         >
-          Chon mua
+          Chọn mua
         </Button>
       </div>
     </div>

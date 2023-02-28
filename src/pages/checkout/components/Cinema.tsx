@@ -6,13 +6,14 @@ type PropsType = {
   lists: VoucherItemType[];
   onSelectCinema: (data: VoucherItemType) => void;
   selectedItem: VoucherItemType;
+  channel: string;
 };
 const Cinema: React.FC<PropsType> = ({
   lists,
   onSelectCinema,
   selectedItem,
+  channel,
 }) => {
-  console.log(selectedItem);
   return (
     <div className="section sec-cinema">
       <Container>
@@ -23,6 +24,7 @@ const Cinema: React.FC<PropsType> = ({
           <div className="cinema-list">
             {lists?.map((item: VoucherItemType) => (
               <CinemaItem
+                channel={channel}
                 active={selectedItem.id === item.id}
                 key={item.id}
                 data={item}

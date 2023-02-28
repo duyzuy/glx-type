@@ -1,6 +1,6 @@
 import { BookingType } from "../models";
 import { loginApi } from "../api/login";
-import { VoucherItemType } from "../models";
+import { VoucherItemType, ComboItemType } from "../models";
 import {
   createReducer,
   createAsyncThunk,
@@ -10,9 +10,16 @@ import {
 export const onSelectCinema = createAction(
   "booking/onSelectCinema",
   (cinemaItem: VoucherItemType) => {
-    console.log(cinemaItem);
     return {
       payload: { ...cinemaItem },
+    };
+  }
+);
+export const onSelectCombo = createAction(
+  "booking/onSelectCombo",
+  (comboItem: ComboItemType) => {
+    return {
+      payload: { ...comboItem },
     };
   }
 );
@@ -36,6 +43,8 @@ const initialState: BookingType = {
     price: 0,
     planId: "",
     type: "",
+    cinemaId: "",
+    ticketType: "",
   },
 };
 
@@ -44,6 +53,14 @@ const bookingReducer = createReducer(initialState, (builder) => {
     return {
       ...state,
       voucherType: {
+        ...action.payload,
+      },
+    };
+  });
+  builder.addCase(onSelectCombo, (state, action) => {
+    return {
+      ...state,
+      comboItem: {
         ...action.payload,
       },
     };

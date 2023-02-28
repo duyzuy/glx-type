@@ -3,7 +3,7 @@ import { Container, Grid } from "semantic-ui-react";
 import * as Icon from "react-feather";
 const ContentBox: React.FC = () => {
   return (
-    <Container>
+    <div className="section section-content">
       <Grid centered>
         <Grid.Column mobile={16} tablet={16} computer={14}>
           <div className="section-body">
@@ -54,7 +54,7 @@ const ContentBox: React.FC = () => {
           </div>
         </Grid.Column>
       </Grid>
-    </Container>
+    </div>
   );
 };
 export default ContentBox;

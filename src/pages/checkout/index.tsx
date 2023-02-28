@@ -7,9 +7,11 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import Cinema from "./components/Cinema";
 import ContentBox from "./components/ContentBox";
 import { VoucherItemType } from "../../models";
-import { onSelectCinema } from "../../reducer/booking";
+import { onSelectCinema, onSelectCombo } from "../../reducer/booking";
 import "./style.scss";
-
+import ComboItem from "./components/ComboItem";
+import { TicketKeys, ComboItemType } from "../../models";
+type ComboKeyType = keyof typeof TicketKeys;
 const CheckoutPage = () => {
   const { chanelType = "" } = useParams();
   const dispatch = useAppDispatch();
@@ -23,6 +25,10 @@ const CheckoutPage = () => {
   const handleSelectCinema = (cinemaItem: VoucherItemType) => {
     dispatch(onSelectCinema(cinemaItem));
   };
+  const handleSelectCombo = (comboItem: ComboItemType) => {
+    dispatch(onSelectCombo(comboItem));
+  };
+
   useEffect(() => {
     (async () => {
       Promise.all([
@@ -37,8 +43,8 @@ const CheckoutPage = () => {
         <Container>
           <section className="section-top">
             <Image
-              src={`${process.env.PUBLIC_URL}/images/${chanelType}/image-checkout-top.png`}
-              alt="zalo promotion checkout"
+              src={`${process.env.PUBLIC_URL}/images/${chanelType}/combo-top.png`}
+              alt="promotion checkout"
             />
           </section>
           <SectionContent chanel={chanelType} />
@@ -46,8 +52,37 @@ const CheckoutPage = () => {
             lists={voucherType}
             onSelectCinema={handleSelectCinema}
             selectedItem={bookingInfo.voucherType}
+            channel={chanelType}
           />
           <ContentBox />
+          <div className="section section-combo">
+            <div className="commbo-list">
+              {(bookingInfo.voucherType.id && (
+                <>
+                  {Object.keys(TicketKeys).map(
+                    (key: ComboKeyType) =>
+                      bookingInfo.voucherType[TicketKeys[key]] && (
+                        <ComboItem
+                          cinemaId={bookingInfo.voucherType.id}
+                          ticketType={TicketKeys[key]}
+                          data={bookingInfo.voucherType[TicketKeys[key]]}
+                          onSelect={handleSelectCombo}
+                        />
+                      )
+                  )}
+                  {/* 
+                  {bookingInfo.voucherType[TicketKeys.Third] && (
+                    <ComboItem
+                      cinemaId={bookingInfo.voucherType.id}
+                      ticketType={TicketKeys.Third}
+                      data={bookingInfo.voucherType[TicketKeys.Third]}
+                      onSelect={handleSelectCombo}
+                    />
+                  )} */}
+                </>
+              )) || <></>}
+            </div>
+          </div>
         </Container>
       </div>
     </div>

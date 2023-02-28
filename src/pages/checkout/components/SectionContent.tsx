@@ -13,7 +13,7 @@ const SectionContent: React.FC<PropsType> = ({ chanel }) => {
           <Grid className="block-first" centered verticalAlign="middle">
             <Grid.Column mobile={16} computer={9}>
               <Image
-                src={`${process.env.PUBLIC_URL}/images/${chanel}/image-checkout-col-1.png`}
+                src={`${process.env.PUBLIC_URL}/images/${chanel}/goi-cao-cap.png`}
               />
             </Grid.Column>
             <Grid.Column mobile={16} computer={7}>
@@ -58,7 +58,7 @@ const SectionContent: React.FC<PropsType> = ({ chanel }) => {
           <Grid className="block-second" centered verticalAlign="middle">
             <Grid.Column mobile={16} computer={9}>
               <Image
-                src={`${process.env.PUBLIC_URL}/images/${chanel}/image-checkout-col-2.png`}
+                src={`${process.env.PUBLIC_URL}/images/${chanel}/goi-sieu-viet.png`}
               />
             </Grid.Column>
             <Grid.Column mobile={16} computer={7}>

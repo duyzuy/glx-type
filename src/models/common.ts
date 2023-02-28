@@ -44,6 +44,8 @@ export interface ComboItemType {
   price: number;
   type: string;
   planId: string;
+  cinemaId: string;
+  ticketType: string;
 }
 export interface BookingType {
   chanelAndMethod: {
@@ -52,4 +54,13 @@ export interface BookingType {
   };
   voucherType: VoucherItemType;
   comboItem: ComboItemType;
+}
+
+export enum TicketKeys {
+  Two = "2d",
+  Third = "3d",
+}
+export enum TicketType {
+  Premium = "premium",
+  Platinum = "platinum",
 }

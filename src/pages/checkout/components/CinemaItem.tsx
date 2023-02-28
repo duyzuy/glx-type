@@ -5,16 +5,17 @@ type PropsType = {
   data: VoucherItemType;
   onSelectCinema: (data: any) => void;
   active: boolean;
+  channel: string;
 };
 const CinemaItem: React.FC<PropsType> = (props) => {
-  const { data, onSelectCinema, active } = props;
+  const { data, onSelectCinema, active, channel } = props;
 
   const item = useMemo(() => {
     switch (data?.id) {
       case "cgv": {
         return {
           title: "Chọn rạp CGV",
-          src: `${process.env.PUBLIC_URL}/images/zalo/cinema-cgv.png`,
+          src: `${process.env.PUBLIC_URL}/images/${channel}/cinema-cgv.png`,
           notAvaiable: !data["2d"] && !data["3d"] ? true : false,
         };
       }
@@ -22,7 +23,7 @@ const CinemaItem: React.FC<PropsType> = (props) => {
       case "glxcinema": {
         return {
           title: "Chọn rạp Galaxy",
-          src: `${process.env.PUBLIC_URL}/images/zalo/cinema-galaxy.png`,
+          src: `${process.env.PUBLIC_URL}/images/${channel}/cinema-galaxy.png`,
           notAvaiable: !data["2d"] && !data["3d"] ? true : false,
         };
       }
@@ -30,21 +31,21 @@ const CinemaItem: React.FC<PropsType> = (props) => {
       case "lotte": {
         return {
           title: "Chọn rạp Lotte",
-          src: `${process.env.PUBLIC_URL}/images/zalo/cinema-lotte.png`,
+          src: `${process.env.PUBLIC_URL}/images/${channel}/cinema-lotte.png`,
           notAvaiable: !data["2d"] && !data["3d"] ? true : false,
         };
       }
       case "bhd": {
         return {
           title: "Chọn rạp BHD",
-          src: `${process.env.PUBLIC_URL}/images/zalo/cinema-bhd.png`,
+          src: `${process.env.PUBLIC_URL}/images/${channel}/cinema-bhd.png`,
           notAvaiable: !data["2d"] && !data["3d"] ? true : false,
         };
       }
       case "cinestar": {
         return {
           title: "Chọn rạp Cinestar",
-          src: `${process.env.PUBLIC_URL}/images/zalo/cinema-cinestar.png`,
+          src: `${process.env.PUBLIC_URL}/images/${channel}/cinema-cinestar.png`,
           notAvaiable: !data["2d"] && !data["3d"] ? true : false,
         };
       }
