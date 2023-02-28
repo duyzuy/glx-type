@@ -26,7 +26,6 @@ const checkoutSlice = createSlice({
       };
     });
     builder.addCase(fetchVoucherType.fulfilled, (state, action) => {
-      console.log(state, action);
       return {
         ...state,
         voucherType: [...action?.payload?.data],

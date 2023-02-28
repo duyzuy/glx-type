@@ -39,11 +39,17 @@ export interface VoucherItemType {
     | { name: string; price: number; type: string; planId: string }
     | boolean;
 }
-
+export interface ComboItemType {
+  name: string;
+  price: number;
+  type: string;
+  planId: string;
+}
 export interface BookingType {
   chanelAndMethod: {
     chanel: {};
     method: {};
   };
   voucherType: VoucherItemType;
+  comboItem: ComboItemType;
 }

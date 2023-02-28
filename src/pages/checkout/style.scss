@@ -22,7 +22,9 @@
     }
   }
 }
-
+.sec-cinema {
+  margin-bottom: 30px;
+}
 .cinema-list {
   display: flex;
   justify-content: center;
@@ -32,6 +34,14 @@
     flex-basis: 20%;
     text-align: center;
     padding: 10px;
+    &.active {
+      .item-inner {
+      }
+      .label-text {
+        background-color: green;
+        color: #fff;
+      }
+    }
     .item-inner {
       cursor: pointer;
       padding: 15px;
@@ -46,7 +56,7 @@
     .label-text {
       text-align: center;
 
-      padding: 10px;
+      padding: 10px 15px;
       background-color: #fff;
       display: inline-block;
       min-width: 140px;
@@ -62,9 +72,21 @@
   padding: 20px 0;
   text-transform: uppercase;
 }
-.box-content {
+.boxes {
   display: flex;
   align-items: center;
+  justify-content: center;
+  .box {
+    padding: 15px;
+    .icon {
+      display: inline-block;
+      line-height: 0;
+      margin-bottom: 10px;
+    }
+    .content {
+      padding: 10px;
+    }
+  }
 }
 @media (min-width: 992px) {
   .ui.grid.block-second {

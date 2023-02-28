@@ -1,15 +1,15 @@
 import React, { useMemo, memo } from "react";
 import { Image } from "semantic-ui-react";
-
+import { VoucherItemType } from "../../../models";
 type PropsType = {
-  data: any;
+  data: VoucherItemType;
   onSelectCinema: (data: any) => void;
   active: boolean;
 };
 const CinemaItem: React.FC<PropsType> = (props) => {
   const { data, onSelectCinema, active } = props;
 
-  const dataFilter = useMemo(() => {
+  const item = useMemo(() => {
     switch (data?.id) {
       case "cgv": {
         return {
@@ -60,22 +60,22 @@ const CinemaItem: React.FC<PropsType> = (props) => {
 
   const classes = useMemo(() => {
     let clss = "cinema-item";
-    if (dataFilter.notAvaiable) {
+    if (item.notAvaiable) {
       clss = clss.concat(" ", "disabled");
     }
-    // if (active?.id === data.id) {
-    //   clss = clss.concat(" ", "active");
-    // }
+    if (active) {
+      clss = clss.concat(" ", "active");
+    }
 
     return clss;
-  }, [data, active, dataFilter]);
+  }, [data, active, item]);
   return (
     <>
       <div className={classes}>
         <div className="item-inner" onClick={() => onSelectCinema(data)}>
-          <Image src={dataFilter.src} alt={dataFilter.title} />
+          <Image src={item.src} alt={item.title} />
           <div className="content">
-            <p className="label-text">{dataFilter.title}</p>
+            <p className="label-text">{item.title}</p>
           </div>
         </div>
       </div>

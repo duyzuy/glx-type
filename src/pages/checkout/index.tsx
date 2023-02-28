@@ -6,19 +6,22 @@ import { fetchChanelAndMethod, fetchVoucherType } from "./actions";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import Cinema from "./components/Cinema";
 import ContentBox from "./components/ContentBox";
+import { VoucherItemType } from "../../models";
+import { onSelectCinema } from "../../reducer/booking";
 import "./style.scss";
 
 const CheckoutPage = () => {
   const { chanelType = "" } = useParams();
   const dispatch = useAppDispatch();
   const voucherType = useAppSelector((state) => state.checkout.voucherType);
-  console.log({ voucherType });
+  const bookingInfo = useAppSelector((state) => state.booking);
+
   const channelAndMethod = useAppSelector(
     (state) => state.checkout.chanelAndMethod
   );
 
-  const handleSelectCinema = () => {
-    console.log("seclect");
+  const handleSelectCinema = (cinemaItem: VoucherItemType) => {
+    dispatch(onSelectCinema(cinemaItem));
   };
   useEffect(() => {
     (async () => {
@@ -42,7 +45,7 @@ const CheckoutPage = () => {
           <Cinema
             lists={voucherType}
             onSelectCinema={handleSelectCinema}
-            bookingData={{}}
+            selectedItem={bookingInfo.voucherType}
           />
           <ContentBox />
         </Container>

@@ -1,18 +1,18 @@
 import React, { memo } from "react";
 import { Container } from "semantic-ui-react";
-
 import CinemaItem from "./CinemaItem";
 import { VoucherItemType } from "../../../models";
 type PropsType = {
   lists: VoucherItemType[];
-  onSelectCinema: () => void;
-  bookingData: {};
+  onSelectCinema: (data: VoucherItemType) => void;
+  selectedItem: VoucherItemType;
 };
 const Cinema: React.FC<PropsType> = ({
   lists,
   onSelectCinema,
-  bookingData,
+  selectedItem,
 }) => {
+  console.log(selectedItem);
   return (
     <div className="section sec-cinema">
       <Container>
@@ -21,9 +21,9 @@ const Cinema: React.FC<PropsType> = ({
         </div>
         <div className="section-body">
           <div className="cinema-list">
-            {lists?.map((item) => (
+            {lists?.map((item: VoucherItemType) => (
               <CinemaItem
-                active={false}
+                active={selectedItem.id === item.id}
                 key={item.id}
                 data={item}
                 onSelectCinema={onSelectCinema}
