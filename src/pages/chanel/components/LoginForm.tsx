@@ -5,13 +5,17 @@ import Button from "../../../components/Button";
 
 type PropsType = {
   onHandleSubmit: (e: React.FormEvent) => void;
-  onChange: (key: string, value: string) => void;
+  onChange: (
+    e: React.ChangeEvent<HTMLInputElement>,
+    { key, value }: { key: string; value: string }
+  ) => void;
   data: { [key: string]: any };
   errors: { [key: string]: string };
   onForgotPassword: () => void;
   formState: any;
   counter?: number;
   onChangePhoneNumber: () => void;
+  onResendOTP?: () => void;
 };
 const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
   const {
@@ -23,8 +27,8 @@ const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
     formState,
     counter,
     onChangePhoneNumber,
+    onResendOTP,
   } = props;
-  console.log({ props });
   return (
     <div className="form login-form">
       <p className="label white center">
@@ -37,7 +41,12 @@ const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
             placeholder="Nhập số điện thoại"
             value={data.phoneNumber}
             maxLength={10}
-            onChange={(e) => onChange(RegisterKeys.phoneNumber, e.target.value)}
+            onChange={(e) =>
+              onChange(e, {
+                key: RegisterKeys.phoneNumber,
+                value: e.target.value,
+              })
+            }
             error={errors.phoneNumber}
             ref={ref}
           />
@@ -51,8 +60,12 @@ const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
                   maxLength={10}
                   type="password"
                   onChange={(e) =>
-                    onChange(RegisterKeys.password, e.target.value)
+                    onChange(e, {
+                      key: RegisterKeys.password,
+                      value: e.target.value,
+                    })
                   }
+                  ref={ref}
                   error={errors.password}
                 />
                 <div className="forgot">
@@ -71,14 +84,22 @@ const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
                 value={data.otpCode}
                 maxLength={10}
                 type="password"
-                onChange={(e) => onChange(RegisterKeys.otpCode, e.target.value)}
+                onChange={(e) =>
+                  onChange(e, {
+                    key: RegisterKeys.otpCode,
+                    value: e.target.value,
+                  })
+                }
                 error={errors.otpCode}
+                ref={ref}
               />
               <div className="otp-options">
                 <div className="otp-resend">
                   {(formState.canResendOTP && (
                     <>
-                      <p className="btn-resend white">Gửi lại mã xác nhận</p>
+                      <p className="btn-resend white" onClick={onResendOTP}>
+                        Gửi lại mã xác nhận
+                      </p>
                     </>
                   )) || (
                     <p className="text white">

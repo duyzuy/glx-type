@@ -60,7 +60,7 @@ const ChanelPage: React.FC<Props> = (props) => {
   const isLogedin = useAppSelector((state) => state.userInfo.isLogedin);
   const userData = useAppSelector((state) => state.userInfo.profile);
   const navigate = useNavigate();
-  const phoneRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const [loginData, setLoginData] = useState<FormRegister>({
     phoneNumber: "",
@@ -106,13 +106,24 @@ const ChanelPage: React.FC<Props> = (props) => {
     });
     setErrors({});
   };
-  const onChange = (key: string, value: string) => {
+  const onChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    { key, value }: { key: string; value: string }
+  ) => {
+    console.log(e);
     if (
       key === RegisterKeys.phoneNumber &&
       loginData.nextAction !== LoginActions.CheckAccount
     ) {
-      console.log("reset");
       onResetAll();
+    }
+    if (
+      key === RegisterKeys.phoneNumber &&
+      loginData.nextAction === LoginActions.CheckAccount
+    ) {
+      const regex = new RegExp("[0-9]");
+      const result = regex.test(value);
+      console.log(result);
     }
     setLoginData((prevState) => ({
       ...prevState,
@@ -156,7 +167,39 @@ const ChanelPage: React.FC<Props> = (props) => {
       }));
     }
   }, [counter]);
-
+  const onResendOTP = async () => {
+    loginSchema
+      .validate({ phoneNumber: loginData.phoneNumber }, { abortEarly: false })
+      .then(async (dataSchema) => {
+        console.log(dataSchema);
+        const response = await loginApi.verifyPhoneNumber(
+          dataSchema.phoneNumber
+        );
+        if (response.statusCode === 400) {
+          toast({ type: "error", message: response.message });
+        } else {
+          setFormState((prevState) => ({
+            ...prevState,
+            canResendOTP: false,
+          }));
+          setCounter(60);
+        }
+      })
+      .catch((errors) => {
+        if (errors instanceof yup.ValidationError) {
+          const errorMessage = errors.inner.reduce(
+            (acc: object, current: any) => {
+              return {
+                ...acc,
+                [current.path]: current.message,
+              };
+            },
+            {}
+          );
+          setErrors(errorMessage);
+        }
+      });
+  };
   const onHandleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
@@ -455,7 +498,6 @@ const ChanelPage: React.FC<Props> = (props) => {
   );
   useEffect(() => {
     dispatch(fetchChanelName(chanelType));
-    console.log(phoneRef);
   }, []);
   return (
     <div className="page">
@@ -524,7 +566,8 @@ const ChanelPage: React.FC<Props> = (props) => {
                         onForgotPassword={onForgotPassword}
                         counter={counter}
                         onChangePhoneNumber={onResetAll}
-                        ref={phoneRef}
+                        onResendOTP={onResendOTP}
+                        ref={inputRef}
                       />
                     </>
                   )}
