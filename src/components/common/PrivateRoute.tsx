@@ -19,5 +19,4 @@ const PrivateRoute: React.FC<Props> = ({ children }) => {
   }
   return <Navigate to="/404" />;
 };
-
 export default PrivateRoute;

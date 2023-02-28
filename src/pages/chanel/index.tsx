@@ -28,6 +28,8 @@ import {
 } from "./actions";
 import { fetchChanelName } from "./chanelSlice";
 import { useNavigate } from "react-router-dom";
+
+import { isPhoneNumber } from "../../utils/common";
 interface Props {
   children?: JSX.Element;
 }
@@ -110,7 +112,6 @@ const ChanelPage: React.FC<Props> = (props) => {
     e: React.ChangeEvent<HTMLInputElement>,
     { key, value }: { key: string; value: string }
   ) => {
-    console.log(e);
     if (
       key === RegisterKeys.phoneNumber &&
       loginData.nextAction !== LoginActions.CheckAccount
@@ -121,9 +122,9 @@ const ChanelPage: React.FC<Props> = (props) => {
       key === RegisterKeys.phoneNumber &&
       loginData.nextAction === LoginActions.CheckAccount
     ) {
-      const regex = new RegExp("[0-9]");
-      const result = regex.test(value);
-      console.log(result);
+      if ((!isPhoneNumber(value) && value.length !== 0) || value.length > 10) {
+        return;
+      }
     }
     setLoginData((prevState) => ({
       ...prevState,
@@ -203,6 +204,7 @@ const ChanelPage: React.FC<Props> = (props) => {
   const onHandleSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
+
       if (loginData.nextAction === LoginActions.CheckAccount) {
         loginSchema
           .validate(
@@ -500,10 +502,10 @@ const ChanelPage: React.FC<Props> = (props) => {
     dispatch(fetchChanelName(chanelType));
   }, []);
   return (
-    <div className="page">
+    <div className={`page ${chanelType}`}>
       <div className="inner-page">
         <Container>
-          <div className="section">
+          <div className="section section-chanel">
             <Grid verticalAlign="middle" centered>
               <Grid.Column
                 mobile={16}

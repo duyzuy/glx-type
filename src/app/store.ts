@@ -2,8 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import userReducer from "../reducer/user";
 import chanelReducer from "../pages/chanel/chanelSlice";
-
-const reducer = { chanel: chanelReducer, userInfo: userReducer };
+import checkoutReducer from "../pages/checkout/checkoutSlice";
+import bookingReducer from "../reducer/booking";
+const reducer = {
+  chanel: chanelReducer,
+  userInfo: userReducer,
+  checkout: checkoutReducer,
+  booking: bookingReducer,
+};
 
 const store = configureStore({
   reducer,

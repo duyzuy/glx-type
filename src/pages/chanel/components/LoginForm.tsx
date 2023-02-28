@@ -83,7 +83,6 @@ const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
                 placeholder="Nhập mã xác thực"
                 value={data.otpCode}
                 maxLength={10}
-                type="password"
                 onChange={(e) =>
                   onChange(e, {
                     key: RegisterKeys.otpCode,

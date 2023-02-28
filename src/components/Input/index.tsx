@@ -4,7 +4,7 @@ import * as Icon from "react-feather";
 
 type InputType = {
   name?: string;
-  type?: string;
+  type?: "number" | "text" | "password";
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onKeyUp?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
@@ -17,7 +17,7 @@ type InputType = {
 const Input = forwardRef<HTMLInputElement, InputType>((props, ref) => {
   const {
     name,
-    type,
+    type = "text",
     placeholder,
     onChange,
     onKeyUp,

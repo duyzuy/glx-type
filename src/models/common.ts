@@ -24,3 +24,26 @@ export enum StorageKEY {
   ipAddress = "glx_ipAddress",
 }
 export type ReducerKeys = "userInfo" | "setting";
+
+export interface VoucherItemType {
+  id: string;
+  ["2d"]:
+    | {
+        name: string;
+        price: number;
+        type: string;
+        planId: string;
+      }
+    | boolean;
+  ["3d"]:
+    | { name: string; price: number; type: string; planId: string }
+    | boolean;
+}
+
+export interface BookingType {
+  chanelAndMethod: {
+    chanel: {};
+    method: {};
+  };
+  voucherType: VoucherItemType;
+}
