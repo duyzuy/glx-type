@@ -11,7 +11,7 @@ import { onSelectCinema, onSelectCombo } from "../../reducer/booking";
 import "./style.scss";
 import ComboItem from "./components/ComboItem";
 import { TicketKeys, ComboItemType } from "../../models";
-type ComboKeyType = keyof typeof TicketKeys;
+
 const CheckoutPage = () => {
   const { chanelType = "" } = useParams();
   const dispatch = useAppDispatch();
@@ -59,26 +59,24 @@ const CheckoutPage = () => {
             <div className="commbo-list">
               {(bookingInfo.voucherType.id && (
                 <>
-                  {Object.keys(TicketKeys).map(
-                    (key: ComboKeyType) =>
-                      bookingInfo.voucherType[TicketKeys[key]] && (
-                        <ComboItem
-                          cinemaId={bookingInfo.voucherType.id}
-                          ticketType={TicketKeys[key]}
-                          data={bookingInfo.voucherType[TicketKeys[key]]}
-                          onSelect={handleSelectCombo}
-                        />
-                      )
+                  {bookingInfo.voucherType[TicketKeys.Two] && (
+                    <ComboItem
+                      cinemaId={bookingInfo.voucherType.id}
+                      ticketType={TicketKeys.Two}
+                      data={bookingInfo.voucherType[TicketKeys.Two]}
+                      onSelect={handleSelectCombo}
+                      itemSelected={bookingInfo.comboItem}
+                    />
                   )}
-                  {/* 
                   {bookingInfo.voucherType[TicketKeys.Third] && (
                     <ComboItem
                       cinemaId={bookingInfo.voucherType.id}
                       ticketType={TicketKeys.Third}
                       data={bookingInfo.voucherType[TicketKeys.Third]}
                       onSelect={handleSelectCombo}
+                      itemSelected={bookingInfo.comboItem}
                     />
-                  )} */}
+                  )}
                 </>
               )) || <></>}
             </div>

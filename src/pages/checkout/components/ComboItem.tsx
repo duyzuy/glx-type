@@ -10,6 +10,7 @@ interface PropType {
   ticketType: string;
   cinemaId: string;
   active?: boolean;
+  itemSelected?: ComboItemType;
 }
 const ComboItem: React.FC<PropType> = ({
   data,
@@ -17,6 +18,7 @@ const ComboItem: React.FC<PropType> = ({
   ticketType,
   cinemaId,
   active,
+  itemSelected,
 }) => {
   const classes = useMemo(() => {
     let cls = "combo-item";
@@ -24,8 +26,20 @@ const ComboItem: React.FC<PropType> = ({
     if (data.type) {
       cls = cls.concat(" ", data.type);
     }
+    if (
+      itemSelected?.cinemaId === cinemaId &&
+      itemSelected.ticketType === ticketType
+    ) {
+      cls = cls.concat(" ", "active");
+    }
     return cls;
-  }, [data]);
+  }, [data, itemSelected]);
+  const isActiveItem = useMemo(() => {
+    return (
+      itemSelected?.cinemaId === cinemaId &&
+      itemSelected.ticketType === ticketType
+    );
+  }, [itemSelected]);
   return (
     <div className={classes}>
       <div className="inner-item">
