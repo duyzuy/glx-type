@@ -30,9 +30,8 @@ const OrderSummary: React.FC<PropType> = ({ account, item }) => {
   return (
     <div className="summary center">
       <div className="order-detail">
-        <h3>Thông tin sản phẩm</h3>
+        <h3 className="pland-name">{plandTitle}</h3>
         <ul>
-          <li>{plandTitle}</li>
           <li>
             <p className="label">Số thiết bị xem cùng lúc:</p>
             <p className="value">4</p>
@@ -66,12 +65,18 @@ const OrderSummary: React.FC<PropType> = ({ account, item }) => {
         </ul>
       </div>
       <div className="account-detail">
-        <h3>Tài khoản</h3>
-        <p>{account?.phone}</p>
-      </div>
-      <div>
-        <p>Đơn giá</p>
-        <p>{(item && formatPrice(item.price)) || <></>}</p>
+        <ul>
+          <li>
+            <p className="label">Tài khoản</p>
+            <p className="value">{account?.phone}</p>
+          </li>
+          <li>
+            <p className="label">Đơn giá</p>
+            <p className="value">
+              {(item && formatPrice(item.price)) || <></>}
+            </p>
+          </li>
+        </ul>
       </div>
     </div>
   );

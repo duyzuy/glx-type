@@ -7,7 +7,6 @@ import {
 } from "@reduxjs/toolkit";
 import { StorageKEY } from "../models";
 import { toast } from "../libs/toast";
-import { string } from "yup";
 const initialState: UserInfo = {
   profile: {
     phone: "",
@@ -16,7 +15,7 @@ const initialState: UserInfo = {
   token: "",
   isLogedin: false,
 };
-const logout = createAction("chanel/userLogout", function prepare() {
+const logout = createAction("chanel/userLogout", () => {
   localStorage.removeItem(StorageKEY.authToken);
   localStorage.removeItem(StorageKEY.refreshToken);
   return {

@@ -105,8 +105,8 @@ const CheckoutPage = () => {
               <div className="section-body">
                 <OrderSummary account={profile} item={bookingInfo.comboItem} />
                 <div className="payment-method">
-                  <div className="col-header">
-                    <h3 className="title">Phương thức thanh toán</h3>
+                  <div className="section-header center">
+                    <h2 className="title white">Phương thức thanh toán</h2>
                   </div>
                   <div className="col-body">
                     <div className="methods">
@@ -117,29 +117,36 @@ const CheckoutPage = () => {
                             className="method payment"
                           />
                         </div>
-                        <div className="content">Thanh toán bằng zalopay</div>
                       </div>
                     </div>
-                    <div>Vui lòng bấm vào để thanh toán</div>
-                    <div className="box">
-                      <div className="content">
-                        <p className="text">
-                          Bằng việc thanh toán, Quý khách đã đồng ý với Quy chế
-                          sử dụng Dịch vụ của Galaxy Play và ủy quyền cho Galaxy
-                          Play tự động gia hạn khi hết hạn sử dụng, cho đến khi
-                          bạn hủy tự động gia hạn.
-                        </p>
-                        <div className="secures">
-                          <Image
-                            src={`${process.env.PUBLIC_URL}/images/shopee/ssl-secured.png`}
-                            width={100}
-                            className="img-sc"
-                          />
-                          <Image
-                            src={`${process.env.PUBLIC_URL}/images/shopee/DSS-PCI.png`}
-                            width={100}
-                            className="img-sc"
-                          />
+                    <div className="white center">
+                      <p> Vui lòng bấm vào để thanh toán</p>
+                    </div>
+                    <div className="payment-note">
+                      <div className="box center white">
+                        <div className="content">
+                          <p className="text">
+                            Bằng việc thanh toán, Quý khách đã đồng ý với Quy
+                            chế sử dụng Dịch vụ của Galaxy Play và ủy quyền cho
+                            Galaxy Play tự động gia hạn khi hết hạn sử dụng, cho
+                            đến khi bạn hủy tự động gia hạn.
+                          </p>
+                          <div className="secures">
+                            <div className="icon">
+                              <Image
+                                src={`${process.env.PUBLIC_URL}/images/shopee/ssl-secured.png`}
+                                width={100}
+                                className="img-sc"
+                              />
+                            </div>
+                            <div className="icon">
+                              <Image
+                                src={`${process.env.PUBLIC_URL}/images/shopee/DSS-PCI.png`}
+                                width={100}
+                                className="img-sc"
+                              />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
