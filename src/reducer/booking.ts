@@ -6,7 +6,8 @@ import {
   createAsyncThunk,
   createAction,
 } from "@reduxjs/toolkit";
-
+import { fetchPromotionsOffer } from "../pages/checkout/actions";
+import { WalletName } from "../models";
 export const onSelectCinema = createAction(
   "booking/onSelectCinema",
   (cinemaItem: VoucherItemType) => {
@@ -15,12 +16,46 @@ export const onSelectCinema = createAction(
     };
   }
 );
-export const onSelectCombo = createAction(
+export const onSelectCombo = createAsyncThunk(
   "booking/onSelectCombo",
-  (comboItem: ComboItemType) => {
-    return {
-      payload: { ...comboItem },
-    };
+  async (args: { chanelType: any; comboItem: ComboItemType }, thunkApi) => {
+    const { chanelType, comboItem } = args;
+    let data = { comboItem, offer: {} };
+    const response = await thunkApi
+      .dispatch(
+        fetchPromotionsOffer({
+          cinemaBranch: comboItem.cinemaId,
+          cinemaPackageType: comboItem.type,
+          cinemaType: comboItem.ticketType,
+        })
+      )
+      .unwrap();
+    console.log({ response, chanelType });
+    if (response.error === 0) {
+      const { nonPromotionOffers } = response.data;
+
+      const offer = nonPromotionOffers.svod[comboItem.type];
+      switch (chanelType) {
+        case "zalo": {
+          data.offer = offer[WalletName.ZALOPAY][0];
+          break;
+        }
+        case "shopee": {
+          data.offer = offer[WalletName.SHOPEEPAY][0];
+          break;
+        }
+        case "vnpay": {
+          data.offer = offer[WalletName.VNPAY][0];
+          break;
+        }
+        case "moca": {
+          data.offer = offer[WalletName.MOCA][0];
+          break;
+        }
+      }
+      console.log(offer);
+    }
+    return data;
   }
 );
 const initialState: BookingType = {
@@ -46,6 +81,7 @@ const initialState: BookingType = {
     cinemaId: "",
     ticketType: "",
   },
+  offer: {},
 };
 
 const bookingReducer = createReducer(initialState, (builder) => {
@@ -57,11 +93,14 @@ const bookingReducer = createReducer(initialState, (builder) => {
       },
     };
   });
-  builder.addCase(onSelectCombo, (state, action) => {
+  builder.addCase(onSelectCombo.fulfilled, (state, action) => {
     return {
       ...state,
       comboItem: {
-        ...action.payload,
+        ...action.payload.comboItem,
+      },
+      offer: {
+        ...action.payload.offer,
       },
     };
   });

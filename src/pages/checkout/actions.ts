@@ -18,3 +18,16 @@ export const fetchVoucherType = createAsyncThunk(
     return response;
   }
 );
+
+export const fetchPromotionsOffer = createAsyncThunk(
+  "checkout/fetchPromotionsOffer",
+  async (options: {
+    cinemaBranch: string;
+    cinemaPackageType: string;
+    cinemaType: string;
+  }) => {
+    const response = await checkoutApi.getPromotionOffer({ ...options });
+
+    return response;
+  }
+);

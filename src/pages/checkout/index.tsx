@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useParams } from "react-router";
 import { Container, Grid, Image } from "semantic-ui-react";
 import SectionContent from "./components/SectionContent";
@@ -6,17 +6,25 @@ import { fetchChanelAndMethod, fetchVoucherType } from "./actions";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import Cinema from "./components/Cinema";
 import ContentBox from "./components/ContentBox";
-import { VoucherItemType } from "../../models";
 import { onSelectCinema, onSelectCombo } from "../../reducer/booking";
 import "./style.scss";
 import ComboItem from "./components/ComboItem";
-import { TicketKeys, ComboItemType } from "../../models";
+import OrderSummary from "./components/OrderSummary";
+import {
+  TicketKeys,
+  ComboItemType,
+  BookingType,
+  VoucherItemType,
+} from "../../models";
 
 const CheckoutPage = () => {
   const { chanelType = "" } = useParams();
   const dispatch = useAppDispatch();
-  const voucherType = useAppSelector((state) => state.checkout.voucherType);
-  const bookingInfo = useAppSelector((state) => state.booking);
+  const voucherType = useAppSelector<VoucherItemType[]>(
+    (state) => state.checkout.voucherType
+  );
+  const bookingInfo = useAppSelector<BookingType>((state) => state.booking);
+  const profile = useAppSelector((state) => state.userInfo.profile);
 
   const channelAndMethod = useAppSelector(
     (state) => state.checkout.chanelAndMethod
@@ -25,10 +33,18 @@ const CheckoutPage = () => {
   const handleSelectCinema = (cinemaItem: VoucherItemType) => {
     dispatch(onSelectCinema(cinemaItem));
   };
-  const handleSelectCombo = (comboItem: ComboItemType) => {
-    dispatch(onSelectCombo(comboItem));
+  const handleSelectCombo = async (comboItem: ComboItemType) => {
+    const response = await dispatch(
+      onSelectCombo({ chanelType, comboItem })
+    ).unwrap();
   };
 
+  const isSelectedCinema = useMemo(() => {
+    return bookingInfo.voucherType.id !== "";
+  }, [bookingInfo]);
+  const isComboSelected = useMemo(() => {
+    return isSelectedCinema && bookingInfo.comboItem.planId !== "";
+  }, [isSelectedCinema, bookingInfo]);
   useEffect(() => {
     (async () => {
       Promise.all([
@@ -57,7 +73,7 @@ const CheckoutPage = () => {
           <ContentBox />
           <div className="section section-combo">
             <div className="commbo-list">
-              {(bookingInfo.voucherType.id && (
+              {(isSelectedCinema && (
                 <>
                   {bookingInfo.voucherType[TicketKeys.Two] && (
                     <ComboItem
@@ -81,6 +97,57 @@ const CheckoutPage = () => {
               )) || <></>}
             </div>
           </div>
+          {(isComboSelected && (
+            <div className="section section-payment">
+              <div className="section-header center">
+                <h2 className="title white">Thanh toán</h2>
+              </div>
+              <div className="section-body">
+                <OrderSummary account={profile} item={bookingInfo.comboItem} />
+                <div className="payment-method">
+                  <div className="col-header">
+                    <h3 className="title">Phương thức thanh toán</h3>
+                  </div>
+                  <div className="col-body">
+                    <div className="methods">
+                      <div className="method-item">
+                        <div className="icon">
+                          <Image
+                            src={`${process.env.PUBLIC_URL}/images/${chanelType}/logo-partner.svg`}
+                            className="method payment"
+                          />
+                        </div>
+                        <div className="content">Thanh toán bằng zalopay</div>
+                      </div>
+                    </div>
+                    <div>Vui lòng bấm vào để thanh toán</div>
+                    <div className="box">
+                      <div className="content">
+                        <p className="text">
+                          Bằng việc thanh toán, Quý khách đã đồng ý với Quy chế
+                          sử dụng Dịch vụ của Galaxy Play và ủy quyền cho Galaxy
+                          Play tự động gia hạn khi hết hạn sử dụng, cho đến khi
+                          bạn hủy tự động gia hạn.
+                        </p>
+                        <div className="secures">
+                          <Image
+                            src={`${process.env.PUBLIC_URL}/images/shopee/ssl-secured.png`}
+                            width={100}
+                            className="img-sc"
+                          />
+                          <Image
+                            src={`${process.env.PUBLIC_URL}/images/shopee/DSS-PCI.png`}
+                            width={100}
+                            className="img-sc"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )) || <></>}
         </Container>
       </div>
     </div>

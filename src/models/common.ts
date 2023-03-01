@@ -54,6 +54,7 @@ export interface BookingType {
   };
   voucherType: VoucherItemType;
   comboItem: ComboItemType;
+  offer: object;
 }
 
 export enum TicketKeys {
@@ -63,4 +64,14 @@ export enum TicketKeys {
 export enum TicketType {
   Premium = "premium",
   Platinum = "platinum",
+}
+
+export enum WalletName {
+  MOMO = "MOMO",
+  VNPAY = "VNPAY",
+  ASIAPAY = "ASIAPAY",
+  ZALOPAY = "ZALOPAY",
+  SHOPEEPAY = "SHOPEEPAY",
+  MOCA = "MOCA",
+  FUNDIIN = "FUNDIIN",
 }

@@ -1,6 +1,11 @@
+export interface ProfileInfo {
+  phone?: string;
+  email?: string;
+  [key: string]: any;
+}
 export interface UserInfo {
   token: string;
-  profile: { phone?: string; email?: string; [key: string]: any };
+  profile: ProfileInfo;
   isLogedin: boolean;
 }
 export enum RegisterKeys {

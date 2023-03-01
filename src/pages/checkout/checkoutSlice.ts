@@ -1,15 +1,21 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { fetchChanelAndMethod, fetchVoucherType } from "./actions";
+import {
+  fetchChanelAndMethod,
+  fetchVoucherType,
+  fetchPromotionsOffer,
+} from "./actions";
 import { VoucherItemType } from "../../models";
 interface CheckOutState {
   chanelAndMethod: { channel: { [key: string]: any }; method: Array<{}> };
   voucherType: VoucherItemType[];
+  promotionsOffer: object;
 }
 
 const initialState: CheckOutState = {
   chanelAndMethod: { channel: {}, method: [] },
   voucherType: [],
+  promotionsOffer: {},
 };
 const checkoutSlice = createSlice({
   name: "checkout",
@@ -29,6 +35,12 @@ const checkoutSlice = createSlice({
       return {
         ...state,
         voucherType: [...action?.payload?.data],
+      };
+    });
+    builder.addCase(fetchPromotionsOffer.fulfilled, (state, action) => {
+      return {
+        ...state,
+        promotionsOffer: { ...action?.payload?.data },
       };
     });
   },

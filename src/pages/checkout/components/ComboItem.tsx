@@ -1,9 +1,9 @@
-import { memo, useMemo, useState } from "react";
-
+import { memo, useMemo } from "react";
 import Button from "../../../components/Button";
 import { TicketKeys, TicketType } from "../../../models";
 import { formatPrice } from "../../../utils/common";
 import { ComboItemType } from "../../../models";
+import * as Icon from "react-feather";
 interface PropType {
   data: any;
   onSelect: (data: ComboItemType) => void;
@@ -20,30 +20,33 @@ const ComboItem: React.FC<PropType> = ({
   active,
   itemSelected,
 }) => {
+  const isActiveItem = useMemo(() => {
+    return (
+      itemSelected?.cinemaId === cinemaId &&
+      itemSelected.ticketType === ticketType
+    );
+  }, [itemSelected, ticketType, cinemaId]);
   const classes = useMemo(() => {
     let cls = "combo-item";
 
     if (data.type) {
       cls = cls.concat(" ", data.type);
     }
-    if (
-      itemSelected?.cinemaId === cinemaId &&
-      itemSelected.ticketType === ticketType
-    ) {
+    if (isActiveItem) {
       cls = cls.concat(" ", "active");
     }
     return cls;
-  }, [data, itemSelected]);
-  const isActiveItem = useMemo(() => {
-    return (
-      itemSelected?.cinemaId === cinemaId &&
-      itemSelected.ticketType === ticketType
-    );
-  }, [itemSelected]);
+  }, [data, isActiveItem]);
+
   return (
     <div className={classes}>
       <div className="inner-item">
         <div className="box-content">
+          {(isActiveItem && (
+            <span className="icon">
+              <Icon.CheckCircle size={24} />
+            </span>
+          )) || <></>}
           <div className="content top">
             <div className="content-inner">
               <p className="type">
@@ -70,10 +73,11 @@ const ComboItem: React.FC<PropType> = ({
         <Button
           color="secondary"
           onClick={() => {
+            if (isActiveItem) return;
             onSelect({ cinemaId, ...data, ticketType });
           }}
         >
-          Chọn mua
+          {(isActiveItem && "Đã chọn") || "Chọn mua"}
         </Button>
       </div>
     </div>
