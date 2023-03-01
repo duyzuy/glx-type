@@ -194,6 +194,17 @@
     list-style-type: none;
     padding: 0;
     margin: 0;
+    margin-left: auto;
+    margin-right: auto;
+    width: 250px;
+    li {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      p {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 @media (min-width: 768px) {

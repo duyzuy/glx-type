@@ -28,21 +28,40 @@ const OrderSummary: React.FC<PropType> = ({ account, item }) => {
     }
   }, [item]);
   return (
-    <div className="summary">
+    <div className="summary center">
       <div className="order-detail">
         <h3>Thông tin sản phẩm</h3>
         <ul>
           <li>{plandTitle}</li>
-          <li>Số thiết bị xem cùng lúc: 4</li>
-          <li>Chất lượng hình ảnh: 4K</li>
-          <li>Chất lượng âm thanh: Dolby 5.1</li>
-          <li>Thiết bị hỗ trợ: Tất cả</li>
           <li>
-            Tải về thiết bị di động: <Icon.Check size={20} />
+            <p className="label">Số thiết bị xem cùng lúc:</p>
+            <p className="value">4</p>
           </li>
-          <li>Thời hạn sử dụng: 1 tháng</li>
+          <li>
+            <p className="label">Chất lượng hình ảnh:</p>
+            <p className="value">4K</p>
+          </li>
+          <li>
+            <p className="label">Chất lượng âm thanh:</p>
+            <p className="value">Dolby 5.1</p>
+          </li>
+          <li>
+            <p className="label">Thiết bị hỗ trợ:</p>
+            <p className="value">Tất cả</p>
+          </li>
+          <li>
+            <p className="label">Tải về thiết bị di động:</p>
+            <p className="value"></p> <Icon.Check size={20} />
+          </li>
+          <li>
+            <p className="label">Thời hạn sử dụng:</p>
+            <p className="value">1 tháng</p>
+          </li>
           {(item.planId === PLANID.PLATINUM_ONE_MONTH && (
-            <li>Xem nội dung có phí: Phim Việt + Châu Á</li>
+            <li>
+              <p className="label">Xem nội dung có phí:</p>
+              <p className="value">Phim Việt + Châu Á</p>
+            </li>
           )) || <></>}
         </ul>
       </div>
