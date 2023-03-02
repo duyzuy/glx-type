@@ -26,8 +26,8 @@ export enum StorageKEY {
 export type ReducerKeys = "userInfo" | "setting";
 
 export interface VoucherItemType {
-  id: string;
-  ["2d"]:
+  id?: string;
+  ["2d"]?:
     | {
         name: string;
         price: number;
@@ -35,27 +35,28 @@ export interface VoucherItemType {
         planId: string;
       }
     | boolean;
-  ["3d"]:
+  ["3d"]?:
     | { name: string; price: number; type: string; planId: string }
     | boolean;
 }
 export interface ComboItemType {
-  name: string;
-  price: number;
-  type: string;
-  planId: string;
-  cinemaId: string;
-  ticketType: string;
+  name?: string;
+  price?: number;
+  type?: string;
+  planId?: string;
+  cinemaId?: string;
+  ticketType?: string;
 }
-export interface BookingType {
-  chanelAndMethod: {
-    chanel: {};
-    method: {};
-  };
-  voucherType: VoucherItemType;
-  comboItem: ComboItemType;
-  offer: object;
-}
+
+export type ChanelItemType = {
+  id?: string;
+  name?: string;
+  type?: string;
+  versionFrom?: string;
+  ico?: string;
+  active?: boolean;
+  priority?: number;
+};
 
 export enum TicketKeys {
   Two = "2d",
@@ -74,4 +75,15 @@ export enum WalletName {
   SHOPEEPAY = "SHOPEEPAY",
   MOCA = "MOCA",
   FUNDIIN = "FUNDIIN",
+}
+
+export interface MethodDetailType {
+  qrcode_url?: string;
+  key?: string;
+  token?: string;
+  request_id?: string;
+  redirect_url_web?: string;
+  redirect_url_qr?: string;
+  errcode?: number;
+  debug_msg?: string;
 }

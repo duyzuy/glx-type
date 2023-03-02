@@ -31,3 +31,19 @@ export const fetchPromotionsOffer = createAsyncThunk(
     return response;
   }
 );
+
+export const onSelectPaymentMethod = createAsyncThunk(
+  "checkout/onSelectPaymentMethod",
+  async (args: {
+    channelType: string;
+    clientId: string;
+    returnUrl: string;
+  }) => {
+    const response = await checkoutApi.syncPaymentMethod(args);
+
+    if (response.error === 0) {
+      return response.data;
+    }
+    return {};
+  }
+);

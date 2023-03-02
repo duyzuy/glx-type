@@ -57,29 +57,31 @@ export const checkoutApi = {
 
     return response.data;
   },
+
+  syncPaymentMethod: async (args: {
+    channelType: string;
+    clientId: string;
+    returnUrl: string;
+  }) => {
+    const authToken = localStorage.getItem(StorageKEY.authToken);
+    const { channelType, clientId, returnUrl } = args;
+    const response = await client.post(
+      `${process.env.REACT_APP_API_URL}/billing/${channelType}/sync`,
+      {
+        headers: {
+          "access-token": authToken,
+        },
+        body: {
+          channelType,
+          clientId,
+          returnUrl,
+        },
+      }
+    );
+
+    return response.data;
+  },
 };
-
-// export const syncPaymentMethod = async (params = {}) => {
-//   const authToken = localStorage.getItem("glx-auth-token") || "";
-
-//   const configs = {
-//     method: "POST",
-//     cache: "no-cache",
-//     headers: {
-//       "Content-Type": "application/json",
-//       "access-token": authToken,
-//     },
-//   };
-//   configs.body = JSON.stringify(params);
-//   const response = await fetch(
-//     `${process.env.REACT_APP_API_URL}/billing/zalo/sync`,
-//     {
-//       ...configs,
-//     }
-//   );
-//   const data = await response.json();
-//   return data;
-// };
 
 // export const hubPaymentMethod = async (paymentToken) => {
 //   const configs = {

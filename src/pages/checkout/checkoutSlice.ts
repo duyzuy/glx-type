@@ -5,15 +5,15 @@ import {
   fetchVoucherType,
   fetchPromotionsOffer,
 } from "./actions";
-import { VoucherItemType } from "../../models";
+import { VoucherItemType, ChanelItemType } from "../../models";
 interface CheckOutState {
-  chanelAndMethod: { channel: { [key: string]: any }; method: Array<{}> };
+  chanelAndMethod: { channel: ChanelItemType[]; method: Array<{}> };
   voucherType: VoucherItemType[];
   promotionsOffer: object;
 }
 
 const initialState: CheckOutState = {
-  chanelAndMethod: { channel: {}, method: [] },
+  chanelAndMethod: { channel: [], method: [] },
   voucherType: [],
   promotionsOffer: {},
 };

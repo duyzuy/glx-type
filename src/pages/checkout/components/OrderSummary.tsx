@@ -3,10 +3,10 @@ import React, { memo, useMemo } from "react";
 import { formatPrice } from "../../../utils/common";
 import { Container, Grid } from "semantic-ui-react";
 import * as Icon from "react-feather";
-import { ProfileInfo, ComboItemType } from "../../../models";
+import { ProfileInfoType, ComboItemType } from "../../../models";
 
 interface PropType {
-  account: ProfileInfo;
+  account: ProfileInfoType;
   item: ComboItemType;
 }
 const OrderSummary: React.FC<PropType> = ({ account, item }) => {
@@ -72,9 +72,7 @@ const OrderSummary: React.FC<PropType> = ({ account, item }) => {
           </li>
           <li>
             <p className="label">Đơn giá</p>
-            <p className="value">
-              {(item && formatPrice(item.price)) || <></>}
-            </p>
+            <p className="value">{formatPrice(item?.price || 0) || <></>}</p>
           </li>
         </ul>
       </div>

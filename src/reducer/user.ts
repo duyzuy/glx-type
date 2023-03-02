@@ -1,4 +1,4 @@
-import { UserInfo } from "../models";
+import { UserInfoType } from "../models";
 import { loginApi } from "../api/login";
 import {
   createReducer,
@@ -7,11 +7,8 @@ import {
 } from "@reduxjs/toolkit";
 import { StorageKEY } from "../models";
 import { toast } from "../libs/toast";
-const initialState: UserInfo = {
-  profile: {
-    phone: "",
-    email: "",
-  },
+const initialState: UserInfoType = {
+  profile: {},
   token: "",
   isLogedin: false,
 };
@@ -21,10 +18,7 @@ const logout = createAction("chanel/userLogout", () => {
   return {
     payload: {
       token: "",
-      profile: {
-        phone: "",
-        email: "",
-      },
+      profile: {},
       isLogedin: false,
     },
   };

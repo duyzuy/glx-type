@@ -1,13 +1,17 @@
 import { BookingType } from "../models";
-import { loginApi } from "../api/login";
+
 import { VoucherItemType, ComboItemType } from "../models";
 import {
   createReducer,
   createAsyncThunk,
   createAction,
 } from "@reduxjs/toolkit";
-import { fetchPromotionsOffer } from "../pages/checkout/actions";
+import {
+  fetchPromotionsOffer,
+  onSelectPaymentMethod,
+} from "../pages/checkout/actions";
 import { WalletName } from "../models";
+
 export const onSelectCinema = createAction(
   "booking/onSelectCinema",
   (cinemaItem: VoucherItemType) => {
@@ -24,17 +28,17 @@ export const onSelectCombo = createAsyncThunk(
     const response = await thunkApi
       .dispatch(
         fetchPromotionsOffer({
-          cinemaBranch: comboItem.cinemaId,
-          cinemaPackageType: comboItem.type,
-          cinemaType: comboItem.ticketType,
+          cinemaBranch: comboItem.cinemaId || "",
+          cinemaPackageType: comboItem.type || "",
+          cinemaType: comboItem.ticketType || "",
         })
       )
       .unwrap();
-    console.log({ response, chanelType });
+
     if (response.error === 0) {
       const { nonPromotionOffers } = response.data;
 
-      const offer = nonPromotionOffers.svod[comboItem.type];
+      const offer = nonPromotionOffers.svod[comboItem.type || ""];
       switch (chanelType) {
         case "zalo": {
           data.offer = offer[WalletName.ZALOPAY][0];
@@ -58,30 +62,16 @@ export const onSelectCombo = createAsyncThunk(
     return data;
   }
 );
+
 const initialState: BookingType = {
   chanelAndMethod: {
     chanel: {},
     method: {},
   },
-  voucherType: {
-    id: "",
-    ["2d"]: {
-      name: "",
-      price: 0,
-      type: "",
-      planId: "",
-    },
-    ["3d"]: { name: "", price: 0, type: "", planId: "" },
-  },
-  comboItem: {
-    name: "",
-    price: 0,
-    planId: "",
-    type: "",
-    cinemaId: "",
-    ticketType: "",
-  },
+  voucherType: {},
+  comboItem: {},
   offer: {},
+  paymentData: {},
 };
 
 const bookingReducer = createReducer(initialState, (builder) => {
@@ -101,6 +91,14 @@ const bookingReducer = createReducer(initialState, (builder) => {
       },
       offer: {
         ...action.payload.offer,
+      },
+    };
+  });
+  builder.addCase(onSelectPaymentMethod.fulfilled, (state, action) => {
+    return {
+      ...state,
+      paymentData: {
+        ...action.payload,
       },
     };
   });
