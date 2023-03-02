@@ -22,7 +22,7 @@ export const onSelectCinema = createAction(
 );
 export const onSelectCombo = createAsyncThunk(
   "booking/onSelectCombo",
-  async (args: { chanelType: any; comboItem: ComboItemType }, thunkApi) => {
+  async (args: { chanelType: string; comboItem: ComboItemType }, thunkApi) => {
     const { chanelType, comboItem } = args;
     let data = { comboItem, offer: {} };
     const response = await thunkApi
