@@ -19,6 +19,7 @@ import {
   VoucherItemType,
   WalletName,
   ChanelItemType,
+  OfferItemType,
 } from "../../models";
 
 import "./style.scss";
@@ -90,7 +91,6 @@ const CheckoutPage: React.FC = () => {
   }, [channel, chanelType]);
 
   const onSelectPayment = async (chanelItem: ChanelItemType) => {
-    console.log(chanelItem);
     try {
       let paymentParams = {
         channelType: chanelType,
@@ -108,15 +108,29 @@ const CheckoutPage: React.FC = () => {
       const response = await dispatch(
         onSelectPaymentMethod(paymentParams)
       ).unwrap();
-      console.log({ response });
       /**
        * listen event hub
        */
+      await onListenFromHub({
+        token: response.token || "",
+        offer: bookingInfo.offer,
+      });
     } catch (error) {
       console.log(error);
     }
   };
+  const onListenFromHub = async (args: {
+    token: string;
+    offer: OfferItemType;
+  }) => {
+    const { token, offer } = args;
+    const response = await checkoutApi.onlistenHubPayment({
+      token,
+      channelType: chanelType,
+    });
 
+    console.log({ response });
+  };
   useEffect(() => {
     (async () => {
       Promise.all([
@@ -203,7 +217,7 @@ const CheckoutPage: React.FC = () => {
                     <div className="payment-content">
                       {(paymentData && (
                         <div className="data">
-                          <Image src={paymentData["qrcode_url"] || ""} />
+                          <Image src={paymentData.qrCodeUrl} />
                           <div className="countdown">
                             <p className="white center">
                               <span className="hours">0</span>

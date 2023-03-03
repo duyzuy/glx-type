@@ -1,6 +1,6 @@
 import { checkoutApi } from "../../api/checkout";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-
+import { PaymentDataType } from "../../models";
 const fetchChanelAndMethod = createAsyncThunk(
   "checkout/fetchPaymentMethod",
   async () => {
@@ -39,11 +39,50 @@ export const onSelectPaymentMethod = createAsyncThunk(
     clientId: string;
     returnUrl: string;
   }) => {
+    let reponseData: PaymentDataType = {};
+    const { channelType } = args;
     const response = await checkoutApi.syncPaymentMethod(args);
 
     if (response.error === 0) {
-      return response.data;
+      const { data } = response;
+      switch (channelType) {
+        case "zalo": {
+          reponseData = {
+            qrCodeUrl: data.url,
+            token: data.token,
+            resultCode: data.resultCode,
+            key: data.key,
+            message: data.message,
+          };
+          break;
+        }
+        case "shopee": {
+          reponseData = {
+            qrCodeUrl: data.qrcode_url,
+            token: data.token,
+            resultCode: data.resultCode,
+            key: data.key,
+            message: data.debug_msg,
+            redirectUrlQr: data.redirect_url_qr,
+            redirectUrlWeb: data.redirect_url_web,
+            requestId: data.request_id,
+          };
+        }
+      }
     }
-    return {};
+    return reponseData;
+  }
+);
+
+export const onlistenHubPayment = createAsyncThunk(
+  "checkout/onlistenHubPayment",
+  async (args: { channelType: string; token: string }) => {
+    const { channelType, token } = args;
+
+    const response = await checkoutApi.onlistenHubPayment({
+      channelType,
+      token,
+    });
+    return response;
   }
 );

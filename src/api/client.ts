@@ -1,7 +1,8 @@
-interface Options {
+export interface OptionType {
   body?: object;
   headers?: object;
-  method: string;
+  method?: string;
+  options?: { isHubApi: boolean };
 }
 
 // const { fetch: originalFetch } = window;
@@ -15,10 +16,14 @@ interface Options {
 //   return response;
 // };
 
-const client = async (input: string, { body, headers, method }: Options) => {
+const client = async (
+  input: string,
+  { body, headers, method, options = { isHubApi: false } }: OptionType
+) => {
   const apiUrl = process.env.REACT_APP_API_URL;
+  const apiHubUrl = process.env.REACT_APP_API_HUB_URL;
   const token = localStorage.getItem("glx-token-device") || "";
-
+  const { isHubApi } = options;
   let configs: RequestInit = {
     method: method ? method : "POST",
     cache: "no-cache",
@@ -38,10 +43,13 @@ const client = async (input: string, { body, headers, method }: Options) => {
   if (body) {
     configs.body = JSON.stringify({ ...body });
   }
+  let baseUrl = `${apiUrl}/${input}`;
 
-  const baseUrl = `${apiUrl}/${input}`;
+  if (isHubApi) {
+    baseUrl = `${apiHubUrl}/${input}`;
+  }
 
-  const response: Response = await fetch(baseUrl, { ...configs });
+  const response = await fetch(baseUrl, { ...configs });
 
   return {
     status: response.status,
@@ -50,10 +58,16 @@ const client = async (input: string, { body, headers, method }: Options) => {
   };
 };
 
-client.get = async (input: string, { headers = {} } = {}) => {
-  return await client(input, { method: "GET", headers });
+client.get = async (
+  input: string,
+  { headers = {}, options = { isHubApi: false } }: OptionType
+) => {
+  return await client(input, { method: "GET", headers, options });
 };
-client.post = (input: string, { body = {}, headers = {} }) => {
-  return client(input, { body, headers, method: "POST" });
+client.post = (
+  input: string,
+  { body = {}, headers = {}, options = { isHubApi: false } }: OptionType
+) => {
+  return client(input, { body, headers, method: "POST", options });
 };
 export default client;

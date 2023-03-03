@@ -1,4 +1,9 @@
-import { ChanelItemType, VoucherItemType, ComboItemType } from "./common";
+import {
+  ChanelItemType,
+  VoucherItemType,
+  ComboItemType,
+  PaymentDataType,
+} from "./common";
 import { OfferItemType } from "./offer";
 export interface BookingType {
   chanelAndMethod: {
@@ -8,5 +13,5 @@ export interface BookingType {
   voucherType: VoucherItemType;
   comboItem: ComboItemType;
   offer: OfferItemType;
-  paymentData: { [key: string]: any };
+  paymentData: PaymentDataType;
 }

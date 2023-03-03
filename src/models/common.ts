@@ -87,3 +87,14 @@ export interface MethodDetailType {
   errcode?: number;
   debug_msg?: string;
 }
+
+export interface PaymentDataType {
+  qrCodeUrl?: string;
+  token?: string;
+  requestId?: string;
+  key?: string;
+  resultCode?: string;
+  redirectUrlWeb?: string;
+  redirectUrlQr?: string;
+  message?: string;
+}

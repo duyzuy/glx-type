@@ -1,4 +1,4 @@
-import { BookingType } from "../models";
+import { BookingType, OfferItemType } from "../models";
 
 import { VoucherItemType, ComboItemType } from "../models";
 import {
@@ -24,7 +24,10 @@ export const onSelectCombo = createAsyncThunk(
   "booking/onSelectCombo",
   async (args: { chanelType: string; comboItem: ComboItemType }, thunkApi) => {
     const { chanelType, comboItem } = args;
-    let data = { comboItem, offer: {} };
+    let data: { comboItem: ComboItemType; offer: OfferItemType } = {
+      comboItem,
+      offer: {},
+    };
     const response = await thunkApi
       .dispatch(
         fetchPromotionsOffer({
@@ -57,7 +60,6 @@ export const onSelectCombo = createAsyncThunk(
           break;
         }
       }
-      console.log(offer);
     }
     return data;
   }
