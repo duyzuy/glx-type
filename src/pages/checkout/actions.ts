@@ -1,6 +1,12 @@
 import { checkoutApi } from "../../api/checkout";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { PaymentDataType } from "../../models";
+import {
+  ChanelItemType,
+  MethodItemType,
+  OfferItemType,
+  PaymentDataType,
+} from "../../models";
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 const fetchChanelAndMethod = createAsyncThunk(
   "checkout/fetchPaymentMethod",
   async () => {
@@ -35,19 +41,23 @@ export const fetchPromotionsOffer = createAsyncThunk(
 export const onSelectPaymentMethod = createAsyncThunk(
   "checkout/onSelectPaymentMethod",
   async (args: {
-    channelType: string;
-    clientId: string;
-    returnUrl: string;
+    channel: ChanelItemType;
+    method: MethodItemType;
+    params: {
+      channelType: string;
+      clientId: string;
+      returnUrl: string;
+    };
   }) => {
-    let reponseData: PaymentDataType = {};
-    const { channelType } = args;
-    const response = await checkoutApi.syncPaymentMethod(args);
+    let channelResponse: PaymentDataType = {};
+    const { params } = args;
+    const response = await checkoutApi.syncPaymentMethod(params);
 
     if (response.error === 0) {
       const { data } = response;
-      switch (channelType) {
+      switch (params.channelType) {
         case "zalo": {
-          reponseData = {
+          channelResponse = {
             qrCodeUrl: data.url,
             token: data.token,
             resultCode: data.resultCode,
@@ -57,7 +67,7 @@ export const onSelectPaymentMethod = createAsyncThunk(
           break;
         }
         case "shopee": {
-          reponseData = {
+          channelResponse = {
             qrCodeUrl: data.qrcode_url,
             token: data.token,
             resultCode: data.resultCode,
@@ -70,19 +80,54 @@ export const onSelectPaymentMethod = createAsyncThunk(
         }
       }
     }
-    return reponseData;
+    return {
+      method: args.method,
+      channel: args.channel,
+      syncData: channelResponse,
+    };
   }
 );
 
 export const onlistenHubPayment = createAsyncThunk(
   "checkout/onlistenHubPayment",
-  async (args: { channelType: string; token: string }) => {
+  async (args: {
+    channelType: string;
+    token: string;
+    offer: OfferItemType;
+  }) => {
     const { channelType, token } = args;
-
-    const response = await checkoutApi.onlistenHubPayment({
-      channelType,
-      token,
+    let inputUrl = "";
+    switch (channelType) {
+      case "zalo": {
+        inputUrl = "zalopay";
+        break;
+      }
+      case "shopee": {
+        inputUrl = "shopeepay";
+        break;
+      }
+    }
+    await fetchEventSource(`${process.env.REACT_APP_API_HUB_URL}/${inputUrl}`, {
+      method: "GET",
+      headers: {
+        accept: "text/event-stream",
+        "access-token": token,
+        "content-type": "text/event-stream",
+      },
+      openWhenHidden: true,
+      onopen: async (response) => {
+        console.log({ response });
+        if (response.status === 200) {
+          //settimer
+          console.log("oke");
+        }
+      },
+      onmessage: async (data) => {
+        console.log(data);
+      },
+      onclose: async () => {
+        console.log("closed");
+      },
     });
-    return response;
   }
 );

@@ -100,7 +100,11 @@ const bookingReducer = createReducer(initialState, (builder) => {
     return {
       ...state,
       paymentData: {
-        ...action.payload,
+        ...action.payload.syncData,
+      },
+      chanelAndMethod: {
+        method: { ...action.payload.method },
+        chanel: { ...action.payload.channel },
       },
     };
   });

@@ -1,6 +1,6 @@
 import { OfferItemType, StorageKEY } from "../models";
 import client from "./client";
-
+import { fetchEventSource } from "@microsoft/fetch-event-source";
 export const checkoutApi = {
   fetchChanelAndMethod: async (options?: { [key: string]: any }) => {
     const { version = "1.3", platform = "web" } = options || {};
@@ -78,71 +78,6 @@ export const checkoutApi = {
 
     return response.data;
   },
-  onlistenHubPayment: async (args: { channelType: string; token: string }) => {
-    const { channelType, token } = args;
-    let inputUrl = "";
-
-    switch (channelType) {
-      case "zalo": {
-        inputUrl = "zalopay";
-        break;
-      }
-      case "shopee": {
-        inputUrl = "shopeepay";
-        break;
-      }
-    }
-    await fetch(`${process.env.REACT_APP_API_HUB_URL}/${inputUrl}`, {
-      method: "GET",
-      headers: {
-        accept: "text/event-stream",
-        "access-token": token,
-        "content-type": "text/event-stream",
-      },
-    })
-      .then((response) => response.body)
-      .then((body) => {
-        const reader = body?.getReader();
-
-        return new ReadableStream({
-          start(controller) {
-            function push() {
-              // "done" is a Boolean and value a "Uint8Array"
-              reader?.read().then(({ done, value }) => {
-                // If there is no more data to read
-                if (done) {
-                  console.log("done", done);
-                  controller.close();
-                  return;
-                }
-                // Get the data and send it to the browser via the controller
-
-                const data = Utf8ArrayToStr(value);
-                console.log({ data });
-                // controller.enqueue(data);
-
-                // Check chunks by logging to the console
-                console.log({ done, value });
-                push();
-              });
-            }
-
-            push();
-          },
-        });
-      })
-      .then((stream) => {
-        // Respond with our stream
-        return new Response(stream, {
-          headers: { "Content-Type": "text/event-stream" },
-        }).text();
-      })
-      .then((result) => {
-        // Do things with result
-        console.log(result);
-      });
-  },
-
   makePayment: async (args: { methodId: string; offer: OfferItemType }) => {
     const authToken = localStorage.getItem(StorageKEY.authToken);
     const { methodId, offer } = args;

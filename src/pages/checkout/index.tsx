@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Container, Image } from "semantic-ui-react";
 import { onSelectCinema, onSelectCombo } from "../../reducer/booking";
 import {
   fetchChanelAndMethod,
   fetchVoucherType,
   onSelectPaymentMethod,
+  onlistenHubPayment,
 } from "./actions";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import Cinema from "./components/Cinema";
@@ -23,8 +24,9 @@ import {
 } from "../../models";
 
 import "./style.scss";
-import { checkoutApi } from "../../api/checkout";
 import { isEmpty } from "../../utils/common";
+import { checkoutApi } from "../../api/checkout";
+
 const CheckoutPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const voucherType = useAppSelector<VoucherItemType[]>(
@@ -35,6 +37,7 @@ const CheckoutPage: React.FC = () => {
   const chanelType = useAppSelector((state) => state.chanel.chanelName);
   const deviceInfo = useAppSelector((state) => state.chanel.deviceInfo);
   const paymentData = useAppSelector((state) => state.booking.paymentData);
+  const controlRef = useRef();
   const { channel, method } = useAppSelector(
     (state) => state.checkout.chanelAndMethod
   );
@@ -55,43 +58,48 @@ const CheckoutPage: React.FC = () => {
     return isSelectedCinema && !isEmpty(bookingInfo.comboItem);
   }, [isSelectedCinema, bookingInfo]);
 
-  const channelsActive = useMemo(() => {
-    let type = "";
+  const channelActive = useMemo(() => {
+    let channelName = "";
     switch (chanelType) {
       case "zalo": {
-        type = WalletName.ZALOPAY;
+        channelName = WalletName.ZALOPAY;
         break;
       }
       case "shopee": {
-        type = WalletName.SHOPEEPAY;
+        channelName = WalletName.SHOPEEPAY;
         break;
       }
       case "momo": {
-        type = WalletName.MOMO;
+        channelName = WalletName.MOMO;
         break;
       }
       case "vnpay": {
-        type = WalletName.VNPAY;
+        channelName = WalletName.VNPAY;
         break;
       }
       case "moca": {
-        type = WalletName.MOCA;
+        channelName = WalletName.MOCA;
         break;
       }
       case "fundin": {
-        type = WalletName.FUNDIIN;
+        channelName = WalletName.FUNDIIN;
         break;
       }
       case "asiapay": {
-        type = WalletName.ASIAPAY;
+        channelName = WalletName.ASIAPAY;
         break;
       }
     }
-    return channel.filter((item) => item.active && item.type === type);
+
+    return channel.filter((item) => item.active && item.type === channelName);
   }, [channel, chanelType]);
 
   const onSelectPayment = async (chanelItem: ChanelItemType) => {
     try {
+      const methodActive = method.find(
+        (item) => item.channelName === chanelItem.type
+      );
+
       let paymentParams = {
         channelType: chanelType,
         clientId: profile.id || "",
@@ -106,30 +114,44 @@ const CheckoutPage: React.FC = () => {
       }
 
       const response = await dispatch(
-        onSelectPaymentMethod(paymentParams)
+        onSelectPaymentMethod({
+          channel: chanelItem,
+          method: methodActive || {},
+          params: paymentParams,
+        })
       ).unwrap();
       /**
        * listen event hub
        */
-      await onListenFromHub({
-        token: response.token || "",
-        offer: bookingInfo.offer,
-      });
+      if (!methodActive) {
+        await dispatch(
+          onlistenHubPayment({
+            channelType: chanelType,
+            token: response.syncData.token || "",
+            offer: bookingInfo.offer,
+          })
+        );
+      }
     } catch (error) {
       console.log(error);
     }
   };
-  const onListenFromHub = async (args: {
-    token: string;
+  const onSubmitPayment = async ({
+    methodId,
+    offer,
+  }: {
+    methodId: string;
     offer: OfferItemType;
   }) => {
-    const { token, offer } = args;
-    const response = await checkoutApi.onlistenHubPayment({
-      token,
-      channelType: chanelType,
-    });
-
-    console.log({ response });
+    try {
+      const paymentResponse = await checkoutApi.makePayment({
+        methodId,
+        offer,
+      });
+      console.log({ paymentResponse });
+    } catch (error) {
+      console.log(error);
+    }
   };
   useEffect(() => {
     (async () => {
@@ -198,7 +220,7 @@ const CheckoutPage: React.FC = () => {
                   <div className="col-body">
                     <div className="methods">
                       <>
-                        {channelsActive?.map((item) => (
+                        {channelActive?.map((item) => (
                           <div
                             className="method-item"
                             key={item.id}

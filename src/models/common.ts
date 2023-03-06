@@ -57,7 +57,20 @@ export type ChanelItemType = {
   active?: boolean;
   priority?: number;
 };
-
+export type MethodItemType = {
+  createdAt?: string;
+  channelName?: string;
+  displayName?: string;
+  channelId?: string;
+  methodId?: string;
+  versionFrom?: string;
+  versionTo?: string;
+  momoWalletId?: string;
+  panFirst6?: string;
+  panLast4?: string;
+  displayWallet?: string;
+  ico?: string;
+};
 export enum TicketKeys {
   Two = "2d",
   Third = "3d",

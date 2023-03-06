@@ -5,9 +5,9 @@ import {
   fetchVoucherType,
   fetchPromotionsOffer,
 } from "./actions";
-import { VoucherItemType, ChanelItemType } from "../../models";
+import { VoucherItemType, ChanelItemType, MethodItemType } from "../../models";
 interface CheckOutState {
-  chanelAndMethod: { channel: ChanelItemType[]; method: Array<{}> };
+  chanelAndMethod: { channel: ChanelItemType[]; method: MethodItemType[] };
   voucherType: VoucherItemType[];
   promotionsOffer: object;
 }
