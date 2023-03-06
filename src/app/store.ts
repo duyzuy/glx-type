@@ -1,18 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-
-import userReducer from "../reducer/user";
-import chanelReducer from "../pages/chanel/chanelSlice";
-import checkoutReducer from "../pages/checkout/checkoutSlice";
-import bookingReducer from "../reducer/booking";
-const reducer = {
-  chanel: chanelReducer,
-  userInfo: userReducer,
-  checkout: checkoutReducer,
-  booking: bookingReducer,
-};
+import { createRootReducer } from "./rootReducer";
+import { history } from "../utils/history";
 
 const store = configureStore({
-  reducer,
+  reducer: createRootReducer(history),
+  middleware: (getDefaultMiddleWare) => getDefaultMiddleWare(),
 });
 
 export default store;

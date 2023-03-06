@@ -6,6 +6,8 @@ import "./index.scss";
 import store from "./app/store";
 import { Provider } from "react-redux";
 import AppProvider from "./provider/AppProvider";
+
+import { history } from "./utils/history";
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
