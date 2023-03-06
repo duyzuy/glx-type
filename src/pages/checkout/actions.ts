@@ -1,5 +1,6 @@
 import { checkoutApi } from "../../api/checkout";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { isEmpty } from "../../utils/common";
 import {
   ChanelItemType,
   MethodItemType,
@@ -50,7 +51,10 @@ export const onSelectPaymentMethod = createAsyncThunk(
     };
   }) => {
     let channelResponse: PaymentDataType = {};
-    const { params } = args;
+    const { params, method, channel } = args;
+
+    if (isEmpty(method)) {
+    }
     const response = await checkoutApi.syncPaymentMethod(params);
 
     if (response.error === 0) {
