@@ -9,6 +9,7 @@ import {
 import {
   fetchPromotionsOffer,
   onSelectPaymentMethod,
+  setChannelAndMethod,
 } from "../pages/checkout/actions";
 import { WalletName } from "../models";
 
@@ -22,8 +23,8 @@ export const onSelectCinema = createAction(
 );
 export const onSelectCombo = createAsyncThunk(
   "booking/onSelectCombo",
-  async (args: { chanelType: string; comboItem: ComboItemType }, thunkApi) => {
-    const { chanelType, comboItem } = args;
+  async (args: { channelType: string; comboItem: ComboItemType }, thunkApi) => {
+    const { channelType, comboItem } = args;
     let data: { comboItem: ComboItemType; offer: OfferItemType } = {
       comboItem,
       offer: {},
@@ -42,7 +43,7 @@ export const onSelectCombo = createAsyncThunk(
       const { nonPromotionOffers } = response.data;
 
       const offer = nonPromotionOffers.svod[comboItem.type || ""];
-      switch (chanelType) {
+      switch (channelType) {
         case "zalo": {
           data.offer = offer[WalletName.ZALOPAY][0];
           break;
@@ -102,9 +103,14 @@ const bookingReducer = createReducer(initialState, (builder) => {
       paymentData: {
         ...action.payload.syncData,
       },
+    };
+  });
+  builder.addCase(setChannelAndMethod, (state, action) => {
+    return {
+      ...state,
       chanelAndMethod: {
-        method: { ...action.payload.method },
         chanel: { ...action.payload.channel },
+        method: { ...action.payload.method },
       },
     };
   });

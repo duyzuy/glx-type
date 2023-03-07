@@ -28,35 +28,13 @@ import {
 } from "./actions";
 import { fetchChanelName } from "./chanelSlice";
 import { useNavigate } from "react-router-dom";
-
 import { isPhoneNumber } from "../../utils/common";
-interface Props {
+import { RegisterKeyType, RegisterDataType, LoginActions } from "../../models";
+interface PropsType {
   children?: JSX.Element;
 }
-enum RegisterKeys {
-  phoneNumber = "phoneNumber",
-  otpCode = "otpCode",
-  password = "password",
-  nextAction = "nextAction",
-  token = "token",
-  rfToken = "rfToken",
-}
-interface FormRegister {
-  [RegisterKeys.phoneNumber]: string;
-  [RegisterKeys.password]: string;
-  [RegisterKeys.otpCode]: string;
-  [RegisterKeys.token]: string;
-  [RegisterKeys.rfToken]: string;
-  [RegisterKeys.nextAction]: LoginActions;
-}
-enum LoginActions {
-  CheckAccount = "CheckAccount",
-  VerifyOTP = "VerifyOTP",
-  Login = "Login",
-  CreatePassword = "CreatePassword",
-  ForgotPassword = "ForgotPassword",
-}
-const ChanelPage: React.FC<Props> = (props) => {
+
+const ChanelPage: React.FC<PropsType> = (props) => {
   const { chanelType } = useParams();
   const dispatch = useAppDispatch();
   const isLogedin = useAppSelector((state) => state.userInfo.isLogedin);
@@ -64,7 +42,7 @@ const ChanelPage: React.FC<Props> = (props) => {
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const [loginData, setLoginData] = useState<FormRegister>({
+  const [loginData, setLoginData] = useState<RegisterDataType>({
     phoneNumber: "",
     otpCode: "",
     password: "",
@@ -85,9 +63,9 @@ const ChanelPage: React.FC<Props> = (props) => {
   });
   const [counter, setCounter] = useState<number>(0);
   const [errors, setErrors] = useState<{
-    [RegisterKeys.phoneNumber]?: string;
-    [RegisterKeys.password]?: string;
-    [RegisterKeys.otpCode]?: string;
+    [RegisterKeyType.phoneNumber]?: string;
+    [RegisterKeyType.password]?: string;
+    [RegisterKeyType.otpCode]?: string;
   }>({});
 
   const onResetAll = () => {
@@ -113,13 +91,13 @@ const ChanelPage: React.FC<Props> = (props) => {
     { key, value }: { key: string; value: string }
   ) => {
     if (
-      key === RegisterKeys.phoneNumber &&
+      key === RegisterKeyType.phoneNumber &&
       loginData.nextAction !== LoginActions.CheckAccount
     ) {
       onResetAll();
     }
     if (
-      key === RegisterKeys.phoneNumber &&
+      key === RegisterKeyType.phoneNumber &&
       loginData.nextAction === LoginActions.CheckAccount
     ) {
       if ((!isPhoneNumber(value) && value.length !== 0) || value.length > 10) {
@@ -268,7 +246,9 @@ const ChanelPage: React.FC<Props> = (props) => {
                   ...prevState,
                   isShowOTP: true,
                   isShowPassword: false,
+                  canResendOTP: false,
                 }));
+                setCounter(response.ttlResend);
                 setErrors({});
                 setLoginData((prevState) => ({
                   ...prevState,
@@ -377,6 +357,7 @@ const ChanelPage: React.FC<Props> = (props) => {
                   loginData.rfToken || ""
                 );
                 dispatch(fetchUserInfo(loginData.token));
+                navigate("./checkout");
               })
               .catch((errors) => {
                 if (errors instanceof yup.ValidationError) {
@@ -422,6 +403,7 @@ const ChanelPage: React.FC<Props> = (props) => {
                   //login success
                   setErrors({});
                   onResetAll();
+                  navigate("./checkout");
                 }
               })
               .catch((errors) => {
@@ -498,9 +480,9 @@ const ChanelPage: React.FC<Props> = (props) => {
     },
     [loginData, formState]
   );
-  useEffect(() => {
-    dispatch(fetchChanelName(chanelType));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(fetchChanelName(chanelType));
+  // }, []);
   return (
     <div className={`page ${chanelType}`}>
       <div className="inner-page">

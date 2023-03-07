@@ -1,15 +1,18 @@
 import React, { memo, forwardRef, ForwardedRef } from "react";
-import { RegisterKeys } from "../../../models";
 import Input from "../../../components/Input";
 import Button from "../../../components/Button";
-
+import {
+  LoginActions,
+  RegisterDataType,
+  RegisterKeyType,
+} from "../../../models";
 type PropsType = {
   onHandleSubmit: (e: React.FormEvent) => void;
   onChange: (
     e: React.ChangeEvent<HTMLInputElement>,
     { key, value }: { key: string; value: string }
   ) => void;
-  data: { [key: string]: any };
+  data: RegisterDataType;
   errors: { [key: string]: string };
   onForgotPassword: () => void;
   formState: any;
@@ -43,7 +46,7 @@ const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
             maxLength={10}
             onChange={(e) =>
               onChange(e, {
-                key: RegisterKeys.phoneNumber,
+                key: RegisterKeyType.phoneNumber,
                 value: e.target.value,
               })
             }
@@ -61,18 +64,21 @@ const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
                   type="password"
                   onChange={(e) =>
                     onChange(e, {
-                      key: RegisterKeys.password,
+                      key: RegisterKeyType.password,
                       value: e.target.value,
                     })
                   }
                   ref={ref}
                   error={errors.password}
                 />
-                <div className="forgot">
-                  <Button variant="text" onClick={onForgotPassword}>
-                    Quên mật khẩu?
-                  </Button>
-                </div>
+
+                {(data.nextAction !== LoginActions.CreatePassword && (
+                  <div className="forgot">
+                    <Button variant="text" onClick={onForgotPassword}>
+                      Quên mật khẩu?
+                    </Button>
+                  </div>
+                )) || <></>}
               </div>
             </>
           )) || <></>}
@@ -85,7 +91,7 @@ const LoginForm = forwardRef<HTMLInputElement, PropsType>((props, ref) => {
                 maxLength={10}
                 onChange={(e) =>
                   onChange(e, {
-                    key: RegisterKeys.otpCode,
+                    key: RegisterKeyType.otpCode,
                     value: e.target.value,
                   })
                 }

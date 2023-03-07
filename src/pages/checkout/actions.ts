@@ -1,5 +1,5 @@
 import { checkoutApi } from "../../api/checkout";
-import { createAsyncThunk } from "@reduxjs/toolkit";
+import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { isEmpty } from "../../utils/common";
 import {
   ChanelItemType,
@@ -8,6 +8,7 @@ import {
   PaymentDataType,
 } from "../../models";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
+
 const fetchChanelAndMethod = createAsyncThunk(
   "checkout/fetchPaymentMethod",
   async () => {
@@ -38,28 +39,36 @@ export const fetchPromotionsOffer = createAsyncThunk(
     return response;
   }
 );
-
+export const setChannelAndMethod = createAction(
+  "checkout/fetchChanelAndMethodCampaign",
+  (args: { channel: ChanelItemType; method: MethodItemType }) => {
+    const { channel, method } = args;
+    return {
+      payload: {
+        channel,
+        method,
+      },
+    };
+  }
+);
 export const onSelectPaymentMethod = createAsyncThunk(
   "checkout/onSelectPaymentMethod",
   async (args: {
-    channel: ChanelItemType;
-    method: MethodItemType;
-    params: {
-      channelType: string;
-      clientId: string;
-      returnUrl: string;
-    };
+    channelType: string;
+    clientId: string;
+    returnUrl: string;
   }) => {
     let channelResponse: PaymentDataType = {};
-    const { params, method, channel } = args;
-
-    if (isEmpty(method)) {
-    }
-    const response = await checkoutApi.syncPaymentMethod(params);
+    const { channelType, clientId, returnUrl } = args;
+    const response = await checkoutApi.syncPaymentMethod({
+      channelType,
+      clientId,
+      returnUrl,
+    });
 
     if (response.error === 0) {
       const { data } = response;
-      switch (params.channelType) {
+      switch (channelType) {
         case "zalo": {
           channelResponse = {
             qrCodeUrl: data.url,
@@ -85,8 +94,6 @@ export const onSelectPaymentMethod = createAsyncThunk(
       }
     }
     return {
-      method: args.method,
-      channel: args.channel,
       syncData: channelResponse,
     };
   }

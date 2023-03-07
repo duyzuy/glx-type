@@ -30,11 +30,27 @@ export interface UserInfoType {
   profile: ProfileInfoType;
   isLogedin: boolean;
 }
-export enum RegisterKeys {
+
+export enum RegisterKeyType {
   phoneNumber = "phoneNumber",
   otpCode = "otpCode",
   password = "password",
   nextAction = "nextAction",
   token = "token",
   rfToken = "rfToken",
+}
+export interface RegisterDataType {
+  [RegisterKeyType.phoneNumber]: string;
+  [RegisterKeyType.password]: string;
+  [RegisterKeyType.otpCode]: string;
+  [RegisterKeyType.token]: string;
+  [RegisterKeyType.rfToken]: string;
+  [RegisterKeyType.nextAction]: LoginActions;
+}
+export enum LoginActions {
+  CheckAccount = "CheckAccount",
+  VerifyOTP = "VerifyOTP",
+  Login = "Login",
+  CreatePassword = "CreatePassword",
+  ForgotPassword = "ForgotPassword",
 }

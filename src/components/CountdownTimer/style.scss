@@ -1,0 +1,34 @@
+.time-title {
+  color: #fff;
+  margin-bottom: 10px;
+}
+.show-counter {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .countdown {
+    text-align: center;
+  }
+  p {
+    margin-bottom: 0;
+  }
+  .value {
+    width: 30px;
+    text-align: center;
+  }
+  .space {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+  .type {
+    display: block;
+    text-transform: capitalize;
+    font-size: 12px;
+  }
+  .value {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 2px;
+  }
+}

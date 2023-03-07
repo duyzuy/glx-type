@@ -2,7 +2,7 @@ import React, { memo, useMemo } from "react";
 import "./style.scss";
 
 type Buttontype = {
-  onClick?: () => void;
+  onClick?: (args: any) => void;
   size?: "large" | "medium" | "small";
   color?: "primary" | "secondary" | "default" | "warning" | "info";
   children?: JSX.Element | string;
