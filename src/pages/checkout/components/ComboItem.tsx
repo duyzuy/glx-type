@@ -1,17 +1,17 @@
 import { memo, useMemo } from "react";
 import Button from "../../../components/Button";
-import { TicketKeys, TicketType } from "../../../models";
+import { TicketType } from "../../../models";
 import { formatPrice } from "../../../utils/common";
 import { ComboItemType } from "../../../models";
 import * as Icon from "react-feather";
-interface PropType {
+interface PropsType {
   data: any;
   onSelect: (data: ComboItemType) => void;
   ticketType: string;
   cinemaId: string;
   itemSelected?: ComboItemType;
 }
-const ComboItem: React.FC<PropType> = ({
+const ComboItem: React.FC<PropsType> = ({
   data,
   onSelect,
   ticketType,
@@ -60,9 +60,7 @@ const ComboItem: React.FC<PropType> = ({
             <div className="content second">
               <div className="content-inner">
                 <p className="name">Vé xem phim</p>
-                <p className="combo">
-                  {ticketType === TicketKeys.Two ? "2D" : "3D"}
-                </p>
+                <p className="combo">{ticketType}</p>
               </div>
             </div>
           </div>

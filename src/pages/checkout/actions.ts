@@ -6,8 +6,10 @@ import {
   MethodItemType,
   OfferItemType,
   PaymentDataType,
+  ComboItemType,
+  WalletName,
+  VoucherItemType,
 } from "../../models";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
 
 const fetchChanelAndMethod = createAsyncThunk(
   "checkout/fetchPaymentMethod",
@@ -94,51 +96,99 @@ export const onSelectPaymentMethod = createAsyncThunk(
       }
     }
     return {
+      error: response.error,
+      message: response.message,
       syncData: channelResponse,
     };
   }
 );
+export const showActiveMethod = createAction(
+  "checkout/showActiveMethod",
+  (method: MethodItemType) => {
+    return {
+      payload: {
+        method,
+      },
+    };
+  }
+);
+export const onSelectCinema = createAction(
+  "booking/onSelectCinema",
+  (cinemaItem: VoucherItemType) => {
+    return {
+      payload: { ...cinemaItem },
+    };
+  }
+);
 
-export const onlistenHubPayment = createAsyncThunk(
-  "checkout/onlistenHubPayment",
-  async (args: {
-    channelType: string;
-    token: string;
-    offer: OfferItemType;
-  }) => {
-    const { channelType, token } = args;
-    let inputUrl = "";
-    switch (channelType) {
-      case "zalo": {
-        inputUrl = "zalopay";
-        break;
-      }
-      case "shopee": {
-        inputUrl = "shopeepay";
-        break;
+export const onSelectCombo = createAsyncThunk(
+  "booking/onSelectCombo",
+  async (args: { channelType: string; comboItem: ComboItemType }, thunkApi) => {
+    const { channelType, comboItem } = args;
+    let data: { comboItem: ComboItemType; offer: OfferItemType } = {
+      comboItem,
+      offer: {},
+    };
+    const response = await thunkApi
+      .dispatch(
+        fetchPromotionsOffer({
+          cinemaBranch: comboItem.cinemaId || "",
+          cinemaPackageType: comboItem.type || "",
+          cinemaType: comboItem.ticketType || "",
+        })
+      )
+      .unwrap();
+
+    if (response.error === 0) {
+      const { nonPromotionOffers } = response.data;
+
+      const offer = nonPromotionOffers.svod[comboItem.type || ""];
+      switch (channelType) {
+        case "zalo": {
+          data.offer = offer[WalletName.ZALOPAY][0];
+          break;
+        }
+        case "shopee": {
+          data.offer = offer[WalletName.SHOPEEPAY][0];
+          break;
+        }
+        case "vnpay": {
+          data.offer = offer[WalletName.VNPAY][0];
+          break;
+        }
+        case "moca": {
+          data.offer = offer[WalletName.MOCA][0];
+          break;
+        }
       }
     }
-    await fetchEventSource(`${process.env.REACT_APP_API_HUB_URL}/${inputUrl}`, {
-      method: "GET",
-      headers: {
-        accept: "text/event-stream",
-        "access-token": token,
-        "content-type": "text/event-stream",
+    return {
+      ...data,
+      error: response.error,
+      message: response.message,
+    };
+  }
+);
+
+export const onResetComboSelect = createAction(
+  "booking/onResetComboSelect",
+  () => {
+    return {
+      payload: {
+        comboItem: {},
+        offer: {},
       },
-      openWhenHidden: true,
-      onopen: async (response) => {
-        console.log({ response });
-        if (response.status === 200) {
-          //settimer
-          console.log("oke");
-        }
+    };
+  }
+);
+
+export const onResetPaymentData = createAction(
+  "booking/onResetPaymentData",
+  () => {
+    return {
+      payload: {
+        paymentData: {},
       },
-      onmessage: async (data) => {
-        console.log(data);
-      },
-      onclose: async () => {
-        console.log("closed");
-      },
-    });
+    };
   }
 );

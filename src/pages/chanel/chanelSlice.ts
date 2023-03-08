@@ -1,9 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchCampaignInfo, fetchDeviceInfo, fetchOffer } from "./actions";
+import { DeviceInfoType } from "../../models";
 interface ChanelInfoState {
   chanelName: string;
   campaignStatus: { isActive: boolean };
-  deviceInfo: { [keyname: string]: any };
+  deviceInfo: DeviceInfoType;
   ipAddress: string;
   offer: object;
 }

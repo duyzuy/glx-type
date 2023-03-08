@@ -22,7 +22,11 @@
   src: url(assets/fonts/Lato/Lato-Heavy.ttf);
   font-weight: bolder;
 }
-
+@font-face {
+  font-family: "GLX-Lato-Thin";
+  src: url(assets/fonts/Lato/Lato-Thin.ttf);
+  font-weight: bolder;
+}
 .white {
   color: #fff;
 }

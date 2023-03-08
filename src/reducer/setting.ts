@@ -1,4 +1,3 @@
-import { Action, DeviceInfo } from "../models";
 import {
   FETCH_DEVICE,
   FETCH_IP_ADDRESS,

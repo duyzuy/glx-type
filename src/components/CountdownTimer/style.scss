@@ -9,6 +9,11 @@
   justify-content: center;
   .countdown {
     text-align: center;
+    border-radius: 5px;
+    padding: 5px 10px;
+    letter-spacing: 2px;
+    background: rgb(0 0 0 / 20%);
+    backdrop-filter: blur(1px);
   }
   p {
     margin-bottom: 0;
@@ -25,10 +30,11 @@
     display: block;
     text-transform: capitalize;
     font-size: 12px;
+    letter-spacing: 1px;
+    font-family: "GLX-Lato-Regular";
   }
   .value {
     font-size: 16px;
     font-weight: 900;
-    letter-spacing: 2px;
   }
 }

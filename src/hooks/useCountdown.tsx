@@ -2,19 +2,23 @@ import { useEffect, useState, useRef } from "react";
 
 type DateTimeValueType = string[];
 
-const useCountdown = (targetDate: number) => {
-  const now = new Date().getTime();
+const useCountdown = (targetDate = new Date().getTime()) => {
   const countDownDate = new Date(targetDate).getTime();
 
-  const [countDown, setCountDown] = useState(countDownDate - now);
-  const [days, hours, minutes, seconds]: DateTimeValueType =
-    getReturnValues(countDown);
-  console.log({ days, hours, minutes, seconds });
+  const [countDown, setCountDown] = useState(
+    countDownDate - new Date().getTime()
+  );
+  const [days, hours, minutes, seconds] = getReturnValues(countDown);
+
   const timeRef = useRef<ReturnType<typeof setInterval>>();
+  const isExpired =
+    parseFloat(days) +
+      parseFloat(hours) +
+      parseFloat(minutes) +
+      parseFloat(seconds) <=
+    0;
 
   useEffect(() => {
-    console.log({ seconds });
-
     timeRef.current = setInterval(() => {
       setCountDown(countDownDate - new Date().getTime());
     }, 1000);
@@ -24,20 +28,14 @@ const useCountdown = (targetDate: number) => {
     };
   }, [countDownDate]);
 
-  if (
-    parseFloat(days) +
-      parseFloat(hours) +
-      parseFloat(minutes) +
-      parseFloat(seconds) <=
-    0
-  ) {
+  if (isExpired) {
     clearInterval(timeRef.current);
     return ["00", "00", "00", "00"];
   }
-  return getReturnValues(countDown);
+  return [days, hours, minutes, seconds];
 };
 
-const getReturnValues = (countDown: number): string[] => {
+const getReturnValues = (countDown: number): DateTimeValueType => {
   // calculate time left
   const days = Math.floor(countDown / (1000 * 60 * 60 * 24)).toString();
   let hours = Math.floor(

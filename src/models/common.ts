@@ -71,10 +71,7 @@ export type MethodItemType = {
   displayWallet?: string;
   ico?: string;
 };
-export enum TicketKeys {
-  Two = "2d",
-  Third = "3d",
-}
+
 export enum TicketType {
   Premium = "premium",
   Platinum = "platinum",

@@ -10,13 +10,14 @@ type PropsType = {
 const CountdownTimer: React.FC<PropsType> = ({ targetDate, onExpire }) => {
   const [days, hours, minutes, seconds] = useCountdown(targetDate);
 
-  if (
+  const isExpired =
     parseFloat(days) +
       parseFloat(hours) +
       parseFloat(minutes) +
       parseFloat(seconds) <=
-    0
-  ) {
+    0;
+
+  if (isExpired) {
     if (onExpire && typeof onExpire === "function") {
       onExpire();
     }
@@ -29,7 +30,11 @@ const CountdownTimer: React.FC<PropsType> = ({ targetDate, onExpire }) => {
         <p className="space">:</p>
         <DateTimeDisplay value={minutes} isDanger={false} type="phút" />
         <p className="space">:</p>
-        <DateTimeDisplay value={seconds} isDanger={false} type="giây" />
+        <DateTimeDisplay
+          value={seconds}
+          isDanger={parseFloat(days) < 10}
+          type="giây"
+        />
       </div>
     </>
   );
