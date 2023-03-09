@@ -6,6 +6,7 @@ import {
   MethodItemType,
 } from "./common";
 import { OfferItemType } from "./offer";
+
 export interface BookingType {
   chanelAndMethod: {
     chanel: ChanelItemType;

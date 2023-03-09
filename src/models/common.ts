@@ -39,11 +39,13 @@ export interface VoucherItemType {
     | { name: string; price: number; type: string; planId: string }
     | boolean;
 }
-export interface ComboItemType {
+export interface ComboItemBaseType {
   name?: string;
   price?: number;
   type?: string;
   planId?: string;
+}
+export interface ComboItemType extends ComboItemBaseType {
   cinemaId?: string;
   ticketType?: string;
 }

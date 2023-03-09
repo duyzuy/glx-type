@@ -2,10 +2,10 @@ import { memo, useMemo } from "react";
 import Button from "../../../components/Button";
 import { TicketType } from "../../../models";
 import { formatPrice } from "../../../utils/common";
-import { ComboItemType } from "../../../models";
+import { ComboItemType, ComboItemBaseType } from "../../../models";
 import * as Icon from "react-feather";
 interface PropsType {
-  data: any;
+  data: ComboItemBaseType | any;
   onSelect: (data: ComboItemType) => void;
   ticketType: string;
   cinemaId: string;
@@ -27,7 +27,7 @@ const ComboItem: React.FC<PropsType> = ({
   const classes = useMemo(() => {
     let cls = "combo-item";
 
-    if (data.type) {
+    if (data?.type) {
       cls = cls.concat(" ", data.type);
     }
     if (isActiveItem) {
@@ -49,7 +49,7 @@ const ComboItem: React.FC<PropsType> = ({
             <div className="content top">
               <div className="content-inner">
                 <p className="type">
-                  {data.type === TicketType.Premium
+                  {data?.type === TicketType.Premium
                     ? "Gói cao cấp"
                     : "Gói siêu việt"}
                 </p>
@@ -65,7 +65,7 @@ const ComboItem: React.FC<PropsType> = ({
             </div>
           </div>
           <div className="box-price">
-            <p className="price">{formatPrice(data.price)}</p>
+            <p className="price">{data?.price && formatPrice(data.price)}</p>
           </div>
           <Button
             color="secondary"

@@ -9,17 +9,18 @@ interface PropType {
   account: ProfileInfoType;
   item: ComboItemType;
 }
+
+enum PlanId {
+  PLATINUM_ONE_MONTH = "glxplay_platinum_1_month",
+  PREMIUM_ONE_MONTH = "glxplay_premium_1_month",
+}
 const OrderSummary: React.FC<PropType> = ({ account, item }) => {
-  const PLANID = {
-    PLATINUM_ONE_MONTH: "glxplay_platinum_1_month",
-    PREMIUM_ONE_MONTH: "glxplay_premium_1_month",
-  };
   const plandTitle = useMemo(() => {
     switch (item?.planId) {
-      case PLANID.PLATINUM_ONE_MONTH: {
+      case PlanId.PLATINUM_ONE_MONTH: {
         return "Gói Galaxy Play siêu việt 1 tháng";
       }
-      case PLANID.PREMIUM_ONE_MONTH: {
+      case PlanId.PREMIUM_ONE_MONTH: {
         return "Gói Galaxy Play cao cấp 1 tháng";
       }
       default: {
@@ -56,7 +57,7 @@ const OrderSummary: React.FC<PropType> = ({ account, item }) => {
             <p className="label">Thời hạn sử dụng:</p>
             <p className="value">1 tháng</p>
           </li>
-          {(item.planId === PLANID.PLATINUM_ONE_MONTH && (
+          {(item.planId === PlanId.PLATINUM_ONE_MONTH && (
             <li>
               <p className="label">Xem nội dung có phí:</p>
               <p className="value">Phim Việt + Châu Á</p>
