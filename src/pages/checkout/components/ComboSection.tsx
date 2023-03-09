@@ -13,12 +13,18 @@ const ComboSection = React.forwardRef<HTMLDivElement, PropsType>(
         <div className="commbo-list">
           {ticketKeys.map(
             (key) =>
-              bookingInfo.voucherType[key as keyof VoucherItemType] && (
+              bookingInfo.voucherType[
+                key as keyof Omit<VoucherItemType, "id">
+              ] && (
                 <ComboItem
                   key={key}
                   cinemaId={bookingInfo.voucherType.id || ""}
                   ticketType={key as keyof VoucherItemType}
-                  data={bookingInfo.voucherType[key as keyof VoucherItemType]}
+                  data={
+                    bookingInfo.voucherType[
+                      key as keyof Omit<VoucherItemType, "id">
+                    ] || {}
+                  }
                   onSelect={onleSelectCombo}
                   itemSelected={bookingInfo.comboItem}
                 />

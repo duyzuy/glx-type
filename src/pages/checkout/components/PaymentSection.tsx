@@ -202,90 +202,95 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
         </div>
         <div className="section-body">
           <OrderSummary account={profile} item={bookingInfo.comboItem} />
-          <div className="payment-method">
-            <div className="section-header center">
-              <h2 className="title white">Phương thức thanh toán</h2>
+          <div className="payment-method col-chanel-method">
+            <div className="col-header">
+              <h3 className="col-title">Phương thức thanh toán</h3>
             </div>
             <div className="col-body">
-              <div className="channels">
-                {(!isEmpty(channelAndMethodActive.chanel) && (
-                  <div
-                    className="channel-item"
-                    key={channelAndMethodActive.chanel.id}
-                    onClick={() =>
-                      onSelectPayment(channelAndMethodActive.chanel)
-                    }
-                  >
-                    <div className="icon">
-                      <Image
-                        src={channelAndMethodActive.chanel.ico}
-                        className="method payment"
-                      />
-                    </div>
-                  </div>
-                )) || <></>}
-              </div>
-              <div className="payment-content">
-                {(!isEmpty(channelAndMethodActive.method) && (
-                  <>
-                    <div className="methods">
-                      <div
-                        className="method-item"
-                        key={channelAndMethodActive.method.methodId}
-                        onClick={() =>
-                          onSelectPayment(channelAndMethodActive.method)
-                        }
-                      >
-                        <div className="icon">
-                          <Image
-                            src={channelAndMethodActive.method.ico}
-                            className="method payment"
-                          />
-                        </div>
-                        <div className="content">
-                          <p className="name">
-                            {channelAndMethodActive.method.channelName}
-                          </p>
-                          <span className="icon-check">
-                            <Icon.Check size={12} />
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <Button
-                      color="primary"
-                      className="payment-button"
+              <div className="payment-top">
+                <div className="channels">
+                  {(!isEmpty(channelAndMethodActive.chanel) && (
+                    <div
+                      className="channel-item"
+                      key={channelAndMethodActive.chanel.id}
                       onClick={() =>
-                        handleSubmitPayment({
-                          methodId:
-                            channelAndMethodActive.method.methodId || "",
-                          offer: bookingInfo.offer,
-                        })
+                        onSelectPayment(channelAndMethodActive.chanel)
                       }
                     >
-                      Thanh toán ngay
-                    </Button>
-                  </>
-                )) ||
-                  (!isEmpty(paymentData) && (
-                    <div className="data">
-                      <Image src={paymentData.qrCodeUrl} />
-                      <div className="counter">
-                        <CountdownTimer targetDate={counter} />
+                      <div className="icon">
+                        <Image
+                          src={channelAndMethodActive.chanel.ico}
+                          className="method payment"
+                        />
                       </div>
                     </div>
                   )) || <></>}
-                {(isEmpty(bookingInfo.chanelAndMethod.method) &&
-                  isEmpty(paymentData) && (
-                    <p className="white center">
-                      Vui lòng bấm vào {channelType} để thanh toán
-                    </p>
-                  )) || <></>}
+                </div>
+                <div className="payment-content center">
+                  {(!isEmpty(channelAndMethodActive.method) && (
+                    <>
+                      <div className="methods">
+                        <div
+                          className="method-item"
+                          key={channelAndMethodActive.method.methodId}
+                          onClick={() =>
+                            onSelectPayment(channelAndMethodActive.method)
+                          }
+                        >
+                          <div className="icon">
+                            <Image
+                              src={channelAndMethodActive.method.ico}
+                              className="method payment"
+                            />
+                          </div>
+                          <div className="content">
+                            <p className="name">
+                              {channelAndMethodActive.method.channelName}
+                            </p>
+                            <span className="icon-check">
+                              <Icon.Check size={12} />
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        color="primary"
+                        className="payment-button"
+                        onClick={() =>
+                          handleSubmitPayment({
+                            methodId:
+                              channelAndMethodActive.method.methodId || "",
+                            offer: bookingInfo.offer,
+                          })
+                        }
+                      >
+                        Thanh toán ngay
+                      </Button>
+                    </>
+                  )) ||
+                    (!isEmpty(paymentData) && (
+                      <div className="payment-data">
+                        <div className="qrcode">
+                          {" "}
+                          <Image src={paymentData.qrCodeUrl} />
+                        </div>
+                        <div className="counter">
+                          <CountdownTimer targetDate={counter} />
+                        </div>
+                      </div>
+                    )) || <></>}
+                  {(isEmpty(bookingInfo.chanelAndMethod.method) &&
+                    isEmpty(paymentData) && (
+                      <p className="content">
+                        Vui lòng bấm vào {channelType} để thanh toán
+                      </p>
+                    )) || <></>}
+                </div>
               </div>
               <div className="payment-note">
-                <div className="box center white">
+                <div className="box">
                   <div className="content">
-                    <p className="text">
+                    <p className="text center">
                       Bằng việc thanh toán, Quý khách đã đồng ý với Quy chế sử
                       dụng Dịch vụ của Galaxy Play và ủy quyền cho Galaxy Play
                       tự động gia hạn khi hết hạn sử dụng, cho đến khi bạn hủy

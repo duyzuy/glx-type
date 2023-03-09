@@ -5,7 +5,7 @@ import { formatPrice } from "../../../utils/common";
 import { ComboItemType, ComboItemBaseType } from "../../../models";
 import * as Icon from "react-feather";
 interface PropsType {
-  data: ComboItemBaseType | any;
+  data: ComboItemBaseType;
   onSelect: (data: ComboItemType) => void;
   ticketType: string;
   cinemaId: string;

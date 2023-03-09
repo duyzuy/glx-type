@@ -15,7 +15,7 @@ enum PlanId {
   PREMIUM_ONE_MONTH = "glxplay_premium_1_month",
 }
 const OrderSummary: React.FC<PropType> = ({ account, item }) => {
-  const plandTitle = useMemo(() => {
+  const planTitle = useMemo(() => {
     switch (item?.planId) {
       case PlanId.PLATINUM_ONE_MONTH: {
         return "Gói Galaxy Play siêu việt 1 tháng";
@@ -29,9 +29,9 @@ const OrderSummary: React.FC<PropType> = ({ account, item }) => {
     }
   }, [item]);
   return (
-    <div className="summary center">
+    <div className="summary col-summary">
       <div className="order-detail">
-        <h3 className="pland-name">{plandTitle}</h3>
+        <h3 className="plan-name">{planTitle}</h3>
         <ul>
           <li>
             <p className="label">Số thiết bị xem cùng lúc:</p>

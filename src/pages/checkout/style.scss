@@ -63,6 +63,7 @@
 }
 .title {
   font-family: "GLX-LATOBlack";
+  font-size: 30px;
 }
 .section-header {
   margin-bottom: 20px;
@@ -192,8 +193,11 @@
 }
 .channel-item {
   cursor: pointer;
+  // border: 1px solid #f1f1f1;
+  border-radius: 5px;
+  box-shadow: 0px 5px 12px -4px rgb(0 0 0 / 20%);
   .icon {
-    width: 150px;
+    width: 120px;
     background-color: #fff;
     padding: 10px;
     border-radius: 5px;
@@ -201,24 +205,39 @@
 }
 .section-payment {
   padding-bottom: 60px;
-  // .section-body {
-  //   background-color: rgb(255 255 255 / 24%);
-  //   border-radius: 10px;
-  //   padding: 20px;
-  //   backdrop-filter: blur(5px);
-  // }
+  .section-body {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+  }
+  .col-chanel-method {
+    flex: 1;
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 15px;
+  }
+  .col-summary {
+    width: 450px;
+    padding-left: 60px;
+  }
+}
+.col-header {
+  margin-bottom: 20px;
+}
+.col-title {
+  font-size: 24px;
+  font-family: "GLX-Lato";
 }
 .order-detail,
 .account-detail {
   width: 100%;
   max-width: 450px;
   background-color: #fff;
-  padding: 30px;
-  border-radius: 15px;
+  padding: 20px;
+  border-radius: 20px;
   margin-left: auto;
   margin-right: auto;
-  margin-bottom: 20px;
-  .pland-name {
+  .plan-name {
     text-transform: uppercase;
     padding: 10px 0;
   }
@@ -243,6 +262,9 @@
     }
   }
 }
+.order-detail {
+  margin-bottom: 20px;
+}
 .methods,
 .channels {
   display: flex;
@@ -259,7 +281,7 @@
   padding: 5px 10px;
   border: 1px solid #f1f1f1;
   border-radius: 8px;
-  color: #fff;
+
   .content {
     display: flex;
     justify-content: space-between;
@@ -276,6 +298,7 @@
     line-height: 20px;
     margin-left: 30px;
     display: inline-block;
+    color: #fff;
   }
   .icon {
     width: 60px;
@@ -305,13 +328,14 @@
     border-width: 0;
   }
 }
+
 .secures {
   display: flex;
   align-items: center;
   justify-content: center;
   .icon {
     padding: 10px;
-    background-color: #fff;
+    background-color: #f9f9f9;
     padding: 10px;
     border-radius: 5px;
     max-width: 80px;
@@ -322,6 +346,18 @@
   }
   img {
     display: inline-block;
+  }
+}
+.payment-data {
+  .qrcode {
+    border: 1px solid #f1f1f1;
+    border-radius: 5px;
+    width: 180px;
+    margin-left: auto;
+    margin-right: auto;
+    img {
+      width: 100%;
+    }
   }
 }
 .counter {

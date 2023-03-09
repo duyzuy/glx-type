@@ -1,5 +1,4 @@
 import React, { memo } from "react";
-import { Container } from "semantic-ui-react";
 import CinemaItem from "./CinemaItem";
 import { VoucherItemType } from "../../../models";
 type PropsType = {

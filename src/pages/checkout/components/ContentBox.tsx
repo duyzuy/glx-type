@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Grid } from "semantic-ui-react";
+import { Grid } from "semantic-ui-react";
 import * as Icon from "react-feather";
 const ContentBox: React.FC = () => {
   return (

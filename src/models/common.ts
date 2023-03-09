@@ -25,20 +25,6 @@ export enum StorageKEY {
 }
 export type ReducerKeys = "userInfo" | "setting";
 
-export interface VoucherItemType {
-  id?: string;
-  ["2d"]?:
-    | {
-        name: string;
-        price: number;
-        type: string;
-        planId: string;
-      }
-    | boolean;
-  ["3d"]?:
-    | { name: string; price: number; type: string; planId: string }
-    | boolean;
-}
 export interface ComboItemBaseType {
   name?: string;
   price?: number;
@@ -48,6 +34,12 @@ export interface ComboItemBaseType {
 export interface ComboItemType extends ComboItemBaseType {
   cinemaId?: string;
   ticketType?: string;
+}
+
+export interface VoucherItemType {
+  id?: string;
+  ["2d"]?: ComboItemBaseType;
+  ["3d"]?: ComboItemBaseType;
 }
 
 export type ChanelItemType = {

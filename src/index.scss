@@ -27,6 +27,13 @@
   src: url(assets/fonts/Lato/Lato-Thin.ttf);
   font-weight: bolder;
 }
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: "GLX-lato";
+}
 .white {
   color: #fff;
 }
@@ -48,4 +55,12 @@ html {
   position: fixed;
   left: 0;
   right: 0;
+}
+.section-header {
+  .title {
+    font-size: 40px;
+    background: -webkit-linear-gradient(#eee, #333);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 }

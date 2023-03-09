@@ -1,9 +1,7 @@
 .time-title {
-  color: #fff;
   margin-bottom: 10px;
 }
 .show-counter {
-  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,8 +10,8 @@
     border-radius: 5px;
     padding: 5px 10px;
     letter-spacing: 2px;
-    background: rgb(0 0 0 / 20%);
-    backdrop-filter: blur(1px);
+    // background: rgb(0 0 0 / 20%);
+    // backdrop-filter: blur(1px);
   }
   p {
     margin-bottom: 0;
