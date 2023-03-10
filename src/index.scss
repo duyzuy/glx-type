@@ -59,8 +59,9 @@ html {
 .section-header {
   .title {
     font-size: 40px;
-    background: -webkit-linear-gradient(#eee, #333);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    // background: -webkit-linear-gradient(#00d469, #03ebf4);
+    // -webkit-background-clip: text;
+    // -webkit-text-fill-color: #ffffff00;
+    text-shadow: 2px 2px 10px rgb(0 0 0 / 20%);
   }
 }

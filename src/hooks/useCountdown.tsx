@@ -1,50 +1,93 @@
 import { useEffect, useState, useRef } from "react";
 
-type DateTimeValueType = string[];
+type DateTime = string[];
 
-const useCountdown = (targetDate = new Date().getTime()) => {
-  const countDownDate = new Date(targetDate).getTime();
-
+type DateTimeValueType = {
+  dateTime: DateTime;
+  isTimeout: boolean;
+};
+let initCountdownDate = {
+  dateTime: ["00", "00", "00", "00"],
+  isTimeout: false,
+};
+const useCountdown = ({
+  targetDate,
+  currentDate,
+}: {
+  targetDate: number;
+  currentDate: number;
+}): DateTimeValueType => {
+  const targetDateCount = new Date(targetDate + 999).getTime();
+  const currentDateCount = new Date(currentDate).getTime();
   const [countDown, setCountDown] = useState(
-    countDownDate - new Date().getTime()
+    targetDateCount > currentDateCount ? targetDateCount - currentDateCount : 0
   );
+
   const [days, hours, minutes, seconds] = getReturnValues(countDown);
 
-  const timeRef = useRef<ReturnType<typeof setInterval>>();
-  const isExpired =
-    parseFloat(days) +
-      parseFloat(hours) +
-      parseFloat(minutes) +
-      parseFloat(seconds) <=
-    0;
+  const timeRef = useRef<ReturnType<typeof setTimeout>>();
+  const isOldCounter = useRef(true);
+  const isExpired = targetDateCount < currentDateCount;
 
   useEffect(() => {
-    timeRef.current = setInterval(() => {
-      setCountDown(countDownDate - new Date().getTime());
+    if (targetDateCount < currentDateCount) return;
+
+    timeRef.current = setTimeout(() => {
+      setCountDown(targetDateCount - currentDateCount);
     }, 1000);
 
-    return () => {
-      clearInterval(timeRef.current);
-    };
-  }, [countDownDate]);
+    return () => clearInterval(timeRef.current);
+  }, [currentDateCount]);
 
-  if (isExpired) {
-    clearInterval(timeRef.current);
-    return ["00", "00", "00", "00"];
+  switch (isOldCounter.current) {
+    case true: {
+      if (isExpired) {
+        clearInterval(timeRef.current);
+        isOldCounter.current = false;
+        initCountdownDate = {
+          ...initCountdownDate,
+          isTimeout: false,
+          dateTime: ["00", "00", "00", "00"],
+        };
+      } else {
+        initCountdownDate = {
+          ...initCountdownDate,
+          isTimeout: false,
+          dateTime: [days, hours, minutes, seconds],
+        };
+      }
+      break;
+    }
+    case false: {
+      if (isExpired) {
+        clearInterval(timeRef.current);
+        isOldCounter.current = true;
+        initCountdownDate = {
+          ...initCountdownDate,
+          isTimeout: true,
+          dateTime: ["00", "00", "00", "00"],
+        };
+      } else {
+        initCountdownDate = {
+          ...initCountdownDate,
+          isTimeout: false,
+          dateTime: [days, hours, minutes, seconds],
+        };
+      }
+      break;
+    }
   }
-  return [days, hours, minutes, seconds];
+
+  return initCountdownDate;
 };
 
-const getReturnValues = (countDown: number): DateTimeValueType => {
+const getReturnValues = (countDown: number): DateTime => {
   // calculate time left
+
   const days = Math.floor(countDown / (1000 * 60 * 60 * 24)).toString();
-  let hours = Math.floor(
-    (countDown % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-  ).toString();
-  let minutes = Math.floor(
-    (countDown % (1000 * 60 * 60)) / (1000 * 60)
-  ).toString();
-  let seconds = Math.floor((countDown % (1000 * 60)) / 1000).toString();
+  let hours = Math.floor((countDown / (1000 * 60 * 60)) % 24).toString();
+  let minutes = Math.floor((countDown / (1000 * 60)) % 60).toString();
+  let seconds = Math.floor((countDown / 1000) % 60).toString();
 
   hours = hours.length === 1 ? "0" + hours : hours;
   minutes = minutes.length === 1 ? "0" + minutes : minutes;

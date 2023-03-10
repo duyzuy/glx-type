@@ -8,16 +8,17 @@ type PropsType = {
   onExpire?: () => void;
 };
 const CountdownTimer: React.FC<PropsType> = ({ targetDate, onExpire }) => {
-  const [days, hours, minutes, seconds] = useCountdown(targetDate);
+  const currentDate = new Date().getTime();
 
-  const isExpired =
-    parseFloat(days) +
-      parseFloat(hours) +
-      parseFloat(minutes) +
-      parseFloat(seconds) <=
-    0;
+  const {
+    dateTime: [days, hours, minutes, seconds],
+    isTimeout,
+  } = useCountdown({
+    targetDate,
+    currentDate,
+  });
 
-  if (isExpired) {
+  if (isTimeout) {
     if (onExpire && typeof onExpire === "function") {
       onExpire();
     }

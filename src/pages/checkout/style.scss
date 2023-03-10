@@ -1,5 +1,19 @@
 .page {
   min-height: 100vh;
+  background: linear-gradient(45deg, #007dff, #03e8f4);
+  position: relative;
+  // &:after {
+  //   content: "";
+  //   position: absolute;
+  //   width: 100%;
+  //   left: 0;
+  //   bottom: 0;
+  //   background: url("../../../public/images/bg-pattern.png");
+  // }
+  // .inner-page {
+  //   position: relative;
+  //   z-index: 2;
+  // }
   &.checkout {
     min-height: 100vh;
   }
@@ -193,7 +207,6 @@
 }
 .channel-item {
   cursor: pointer;
-  // border: 1px solid #f1f1f1;
   border-radius: 5px;
   box-shadow: 0px 5px 12px -4px rgb(0 0 0 / 20%);
   .icon {
@@ -212,9 +225,9 @@
   }
   .col-chanel-method {
     flex: 1;
-    padding: 30px;
+    padding: 20px;
     background-color: #fff;
-    border-radius: 15px;
+    border-radius: 20px;
   }
   .col-summary {
     width: 450px;

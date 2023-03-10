@@ -35,7 +35,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
     const deviceInfo = useAppSelector((state) => state.chanel.deviceInfo);
     const { paymentData } = bookingInfo;
 
-    const [counter, setCounter] = useState(0);
+    const [counterStart, setCounterStart] = useState(new Date().getTime());
     const onSelectPayment = useCallback(
       async (chanelItem: ChanelItemType) => {
         try {
@@ -117,9 +117,9 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
           openWhenHidden: true,
           onopen: async (response) => {
             if (response.status === 200) {
-              console.log("start count");
-              const dateCount = new Date().getTime() + 1 * 20 * 1000;
-              setCounter(() => dateCount);
+              console.log("counting...");
+              const dateCount = new Date().getTime() + 1 * 10 * 1000;
+              setCounterStart(dateCount);
             }
           },
           onmessage: async (data) => {
@@ -195,6 +195,9 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
         })
       );
     }, [channel, channelType, method]);
+    const onExpiredPaymentQr = () => {
+      console.log("expired");
+    };
     return (
       <div className="section section-payment" ref={ref}>
         <div className="section-header center">
@@ -271,11 +274,13 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
                     (!isEmpty(paymentData) && (
                       <div className="payment-data">
                         <div className="qrcode">
-                          {" "}
                           <Image src={paymentData.qrCodeUrl} />
                         </div>
                         <div className="counter">
-                          <CountdownTimer targetDate={counter} />
+                          <CountdownTimer
+                            targetDate={counterStart}
+                            onExpire={onExpiredPaymentQr}
+                          />
                         </div>
                       </div>
                     )) || <></>}
