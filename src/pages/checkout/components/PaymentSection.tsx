@@ -15,6 +15,8 @@ import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { onSelectPaymentMethod, setChannelAndMethod } from "../actions";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { checkoutApi } from "../../../api/checkout";
+import Modal from "../../../components/Modal";
+import ModalErrorContent from "./ModalContent";
 type PropsType = {
   children?: JSX.Element;
   bookingInfo: BookingType;
@@ -34,7 +36,6 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
     );
     const deviceInfo = useAppSelector((state) => state.chanel.deviceInfo);
     const { paymentData } = bookingInfo;
-
     const [counterStart, setCounterStart] = useState(new Date().getTime());
     const onSelectPayment = useCallback(
       async (chanelItem: ChanelItemType) => {
@@ -80,6 +81,16 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
       },
       [channelType, profile, deviceInfo, bookingInfo]
     );
+    const [expire, setExpire] = useState(false);
+    const [paymentStatus, setPaymentStatus] = useState({
+      isShowModal: false,
+      errorType: {
+        paymentFail: false,
+        timeout: false,
+        paymentError: false,
+        streamFail: false,
+      },
+    });
 
     /**
      * @param args
@@ -123,7 +134,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
             }
           },
           onmessage: async (data) => {
-            // console.log(data);
+            console.log(data);
           },
           onclose: async () => {
             console.log("closed");
@@ -196,8 +207,16 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
       );
     }, [channel, channelType, method]);
     const onExpiredPaymentQr = () => {
-      console.log("expired");
+      setPaymentStatus((prevModal) => ({
+        isShowModal: true,
+        errorType: {
+          ...prevModal.errorType,
+          timeout: true,
+        },
+      }));
+      controlRef.current?.abort();
     };
+
     return (
       <div className="section section-payment" ref={ref}>
         <div className="section-header center">
@@ -205,6 +224,15 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
         </div>
         <div className="section-body">
           <OrderSummary account={profile} item={bookingInfo.comboItem} />
+          <Modal
+            isOpen={paymentStatus.isShowModal}
+            onClose={() =>
+              setPaymentStatus((prev) => ({ ...prev, isShowModal: false }))
+            }
+            render={() => (
+              <ModalErrorContent errorType={paymentStatus.errorType} />
+            )}
+          />
           <div className="payment-method col-chanel-method">
             <div className="col-header">
               <h3 className="col-title">Phương thức thanh toán</h3>

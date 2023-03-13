@@ -6,10 +6,7 @@ type DateTimeValueType = {
   dateTime: DateTime;
   isTimeout: boolean;
 };
-let initCountdownDate = {
-  dateTime: ["00", "00", "00", "00"],
-  isTimeout: false,
-};
+
 const useCountdown = ({
   targetDate,
   currentDate,
@@ -17,21 +14,23 @@ const useCountdown = ({
   targetDate: number;
   currentDate: number;
 }): DateTimeValueType => {
-  const targetDateCount = new Date(targetDate + 999).getTime();
+  const targetDateCount = new Date(targetDate).getTime();
   const currentDateCount = new Date(currentDate).getTime();
   const [countDown, setCountDown] = useState(
     targetDateCount > currentDateCount ? targetDateCount - currentDateCount : 0
   );
-
   const [days, hours, minutes, seconds] = getReturnValues(countDown);
-
+  let initCountdownDate = {
+    dateTime: ["00", "00", "00", "00"],
+    isTimeout: false,
+  };
   const timeRef = useRef<ReturnType<typeof setTimeout>>();
-  const isOldCounter = useRef(true);
+  const isStartOfCounting = useRef(false);
   const isExpired = targetDateCount < currentDateCount;
 
   useEffect(() => {
-    if (targetDateCount < currentDateCount) return;
-
+    if (targetDateCount <= currentDateCount) return;
+    isStartOfCounting.current = true;
     timeRef.current = setTimeout(() => {
       setCountDown(targetDateCount - currentDateCount);
     }, 1000);
@@ -39,14 +38,14 @@ const useCountdown = ({
     return () => clearInterval(timeRef.current);
   }, [currentDateCount]);
 
-  switch (isOldCounter.current) {
+  switch (isStartOfCounting.current) {
     case true: {
       if (isExpired) {
         clearInterval(timeRef.current);
-        isOldCounter.current = false;
+        isStartOfCounting.current = false;
         initCountdownDate = {
           ...initCountdownDate,
-          isTimeout: false,
+          isTimeout: true,
           dateTime: ["00", "00", "00", "00"],
         };
       } else {
@@ -60,11 +59,10 @@ const useCountdown = ({
     }
     case false: {
       if (isExpired) {
-        clearInterval(timeRef.current);
-        isOldCounter.current = true;
+        // clearInterval(timeRef.current);
         initCountdownDate = {
           ...initCountdownDate,
-          isTimeout: true,
+          isTimeout: false,
           dateTime: ["00", "00", "00", "00"],
         };
       } else {
