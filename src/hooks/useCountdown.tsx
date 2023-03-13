@@ -21,55 +21,52 @@ const useCountdown = ({
   );
   const [days, hours, minutes, seconds] = getReturnValues(countDown);
   let initCountdownDate = {
-    dateTime: ["00", "00", "00", "00"],
     isTimeout: false,
+    dateTime: [days, hours, minutes, seconds],
   };
-  const timeRef = useRef<ReturnType<typeof setTimeout>>();
-  const isStartOfCounting = useRef(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const isCounterStart = useRef(false);
   const isExpired = targetDateCount < currentDateCount;
 
   useEffect(() => {
-    if (targetDateCount <= currentDateCount) return;
-    isStartOfCounting.current = true;
-    timeRef.current = setTimeout(() => {
+    if (targetDateCount < currentDateCount) return;
+    isCounterStart.current = true;
+    timeoutRef.current = setTimeout(() => {
       setCountDown(targetDateCount - currentDateCount);
     }, 1000);
 
-    return () => clearInterval(timeRef.current);
+    return () => clearTimeout(timeoutRef.current);
   }, [currentDateCount]);
 
-  switch (isStartOfCounting.current) {
+  switch (isCounterStart.current) {
     case true: {
       if (isExpired) {
-        clearInterval(timeRef.current);
-        isStartOfCounting.current = false;
+        clearTimeout(timeoutRef.current);
+        isCounterStart.current = false;
         initCountdownDate = {
           ...initCountdownDate,
           isTimeout: true,
-          dateTime: ["00", "00", "00", "00"],
         };
       } else {
         initCountdownDate = {
           ...initCountdownDate,
           isTimeout: false,
-          dateTime: [days, hours, minutes, seconds],
         };
       }
       break;
     }
     case false: {
       if (isExpired) {
-        // clearInterval(timeRef.current);
+        clearTimeout(timeoutRef.current);
+        isCounterStart.current = false;
         initCountdownDate = {
           ...initCountdownDate,
           isTimeout: false,
-          dateTime: ["00", "00", "00", "00"],
         };
       } else {
         initCountdownDate = {
           ...initCountdownDate,
           isTimeout: false,
-          dateTime: [days, hours, minutes, seconds],
         };
       }
       break;

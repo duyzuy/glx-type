@@ -16,6 +16,7 @@ import PaymentSection from "./components/PaymentSection";
 import Cinema from "./components/Cinema";
 import ContentBox from "./components/ContentBox";
 import SectionContent from "./components/SectionContent";
+import Modal from "../../components/Modal";
 import "./style.scss";
 const CheckoutPage: React.FC = () => {
   const dispatch = useAppDispatch();

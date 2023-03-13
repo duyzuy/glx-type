@@ -16,6 +16,18 @@
   // }
   &.checkout {
     min-height: 100vh;
+    .glx__modal--header {
+      text-align: center;
+    }
+    .glx__modal--body {
+      text-align: center;
+    }
+    .glx__modal--footer {
+      .btn {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
   }
 
   ul.list {
@@ -241,6 +253,14 @@
   font-size: 24px;
   font-family: "GLX-Lato";
 }
+.content-qrstep {
+  border-bottom: 1px solid #f1f1f1;
+  padding: 15px 0;
+  margin-bottom: 15px;
+  p {
+    margin-bottom: 0;
+  }
+}
 .order-detail,
 .account-detail {
   width: 100%;
@@ -322,7 +342,6 @@
   max-width: 650px;
   margin-left: auto;
   margin-right: auto;
-  padding: 20px 0;
 }
 .payment-content {
   padding: 15px 0;

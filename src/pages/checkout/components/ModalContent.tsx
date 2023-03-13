@@ -1,44 +1,35 @@
-import React from "react";
+import React, { memo } from "react";
 type PropsType = {
-  errorType: {
-    paymentError: boolean;
-    paymentFail: boolean;
-    timeout: boolean;
-    streamFail: boolean;
+  type: {
+    isPaymentError: boolean;
+    isPaymentFail: boolean;
+    isTimeout: boolean;
+    isStreammingFail: boolean;
+    isPaymentSuccess: boolean;
   };
 };
-const ModalErrorContent: React.FC<PropsType> = ({ errorType }) => {
+
+const ModalContent: React.FC<PropsType> = ({ type }) => {
   let message = "";
-  if (errorType.paymentError) {
+  if (type.isPaymentError) {
     message = `<p>Có lỗi trong quá trình chờ thanh toán</p>
-    <p>Quý khách vui lòng kiểm tra lại các bước thực hiện thanh toán.</p>`;
+      <p>Quý khách vui lòng kiểm tra lại các bước thực hiện thanh toán.</p>`;
   }
 
-  if (errorType.paymentFail) {
+  if (type.isPaymentFail) {
     message = `<p>Giao dịch không thành công!</p>
-    <p>Quý khách vui lòng kiểm tra lại các bước thực hiện thanh toán.</p>`;
+      <p>Quý khách vui lòng kiểm tra lại các bước thực hiện thanh toán.</p>`;
   }
 
-  if (errorType.timeout) {
-    message = `<p>Phiên giao dịch đã hết hạn</p>`;
+  if (type.isTimeout) {
+    message = `<p>Phiên giao dịch của quý khách đã hết hạn, vui lòng bấm nút thử lại để tiến hành thanh toán.</p>`;
   }
-  if (errorType.streamFail) {
-    message = `<p>Quá trình thanh toán bị gián đoạn</p><p>vui lòng thử lại</p>`;
+  if (type.isStreammingFail) {
+    message = `<p>Quá trình thực hiện thanh toán bị gián đoạn, vui lòng thử lại</p>`;
   }
 
   return (
-    <div
-      className="expired"
-      style={{
-        color: "#0077c8",
-        fontSize: "18px",
-        fontWeight: "bold",
-        padding: "15px 0",
-        lineHeight: 1.3,
-      }}
-    >
-      <div dangerouslySetInnerHTML={{ __html: message }} />
-    </div>
+    <div className="content" dangerouslySetInnerHTML={{ __html: message }} />
   );
 };
-export default ModalErrorContent;
+export default memo(ModalContent);

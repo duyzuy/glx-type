@@ -1,9 +1,23 @@
-import { OfferItemType, StorageKEY } from "../models";
+import {
+  ChanelItemType,
+  MethodItemType,
+  OfferItemType,
+  StorageKEY,
+} from "../models";
 import client from "./client";
-import { fetchEventSource } from "@microsoft/fetch-event-source";
+
 export const checkoutApi = {
-  fetchChanelAndMethod: async (options?: { [key: string]: any }) => {
-    const { version = "1.3", platform = "web" } = options || {};
+  fetchChanelAndMethod: async (args?: {
+    platform?: string;
+    version?: string;
+  }): Promise<{
+    error: number;
+    data: {
+      method?: MethodItemType[];
+      channel?: ChanelItemType[];
+    };
+  }> => {
+    const { version = "1.3", platform = "web" } = args || {};
     const authToken = localStorage.getItem(StorageKEY.authToken);
     const response = await client.get(
       `billing/channel/channelAndMethod?platform=${platform}&version=${version}`,
@@ -13,8 +27,17 @@ export const checkoutApi = {
         },
       }
     );
-
-    return response.data;
+    if (response.data.error === 0) {
+      return {
+        data: response.data.data,
+        error: response.data.error,
+      };
+    } else {
+      return {
+        ...response.data,
+        error: response.data.error,
+      };
+    }
   },
   getVoucherType: async () => {
     const authToken = localStorage.getItem(StorageKEY.authToken);
@@ -90,46 +113,7 @@ export const checkoutApi = {
         offer,
       },
     });
+
+    return response.data;
   },
 };
-
-function Utf8ArrayToStr(array: any) {
-  var out, i, len, c;
-  var char2, char3;
-
-  out = "";
-  len = array.length;
-  i = 0;
-  while (i < len) {
-    c = array[i++];
-    switch (c >> 4) {
-      case 0:
-      case 1:
-      case 2:
-      case 3:
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-        // 0xxxxxxx
-        out += String.fromCharCode(c);
-        break;
-      case 12:
-      case 13:
-        // 110x xxxx   10xx xxxx
-        char2 = array[i++];
-        out += String.fromCharCode(((c & 0x1f) << 6) | (char2 & 0x3f));
-        break;
-      case 14:
-        // 1110 xxxx  10xx xxxx  10xx xxxx
-        char2 = array[i++];
-        char3 = array[i++];
-        out += String.fromCharCode(
-          ((c & 0x0f) << 12) | ((char2 & 0x3f) << 6) | ((char3 & 0x3f) << 0)
-        );
-        break;
-    }
-  }
-
-  return out;
-}
