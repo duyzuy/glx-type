@@ -346,7 +346,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
       //   offer: bookingInfo.offer,
       // });
     };
-
+    const handlePaymentWebview = () => {};
     return (
       <>
         <Modal
@@ -378,26 +378,12 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
               <div className="col-body">
                 <div className="payment-top">
                   <div className="channels">
-                    {(!isEmpty(channelAndMethodActive.chanel) && (
+                    {!isEmpty(channelAndMethodActive.chanel) && (
                       <ChannelItem
                         onSelectPayment={onSelectPayment}
                         channel={channelAndMethodActive.chanel}
                       />
-                      // <div
-                      //   className="channel-item"
-                      //   key={channelAndMethodActive.chanel.id}
-                      //   onClick={() =>
-                      //     onSelectPayment(channelAndMethodActive.chanel)
-                      //   }
-                      // >
-                      //   <div className="icon">
-                      //     <Image
-                      //       src={channelAndMethodActive.chanel.ico}
-                      //       className="method payment"
-                      //     />
-                      //   </div>
-                      // </div>
-                    )) || <></>}
+                    )}
                   </div>
                   <div className="payment-content center">
                     {(!isEmpty(channelAndMethodActive.method) && (
@@ -441,6 +427,17 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
                         </Button>
                       </>
                     )) ||
+                      (deviceInfo.partner === DeviceType.MOBILE && (
+                        <div className="payment-webview">
+                          <Button
+                            color="primary"
+                            className="payment-button"
+                            onClick={handlePaymentWebview}
+                          >
+                            Thanh toán ngay
+                          </Button>
+                        </div>
+                      )) ||
                       (!isEmpty(paymentData) && (
                         <div className="payment-data">
                           <div className="qrcode">
@@ -453,7 +450,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
                             />
                           </div>
                         </div>
-                      )) || <></>}
+                      ))}
                     {(isEmpty(bookingInfo.chanelAndMethod.method) &&
                       isEmpty(paymentData) && (
                         <p className="content">

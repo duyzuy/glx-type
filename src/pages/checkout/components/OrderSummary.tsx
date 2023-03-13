@@ -31,7 +31,7 @@ const OrderSummary: React.FC<PropType> = ({ account, item }) => {
   return (
     <div className="summary col-summary">
       <div className="order-detail">
-        <h3 className="plan-name">{planTitle}</h3>
+        <h4 className="plan-name">{planTitle}</h4>
         <ul>
           <li>
             <p className="label">Số thiết bị xem cùng lúc:</p>
