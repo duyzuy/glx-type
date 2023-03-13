@@ -22,6 +22,7 @@ export enum StorageKEY {
   refreshToken = "glx_rf_token",
   campaignStatus = "glx_campaign_status",
   ipAddress = "glx_ipAddress",
+  booking = "glx_booking",
 }
 export type ReducerKeys = "userInfo" | "setting";
 
@@ -101,4 +102,8 @@ export interface PaymentDataType {
   redirectUrlWeb?: string;
   redirectUrlQr?: string;
   message?: string;
+}
+export enum DeviceType {
+  PC = "pc",
+  MOBILE = "mobile",
 }

@@ -11,14 +11,13 @@ import {
   VoucherItemType,
 } from "../../models";
 
-const fetchChanelAndMethod = createAsyncThunk(
+export const fetchChanelAndMethod = createAsyncThunk(
   "checkout/fetchPaymentMethod",
   async () => {
     const response = await checkoutApi.fetchChanelAndMethod();
     return response;
   }
 );
-export { fetchChanelAndMethod };
 
 export const fetchVoucherType = createAsyncThunk(
   "checkout/fetchVoucherType",

@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, useEffect } from "react";
 import { useCountdown } from "../../hooks/useCountdown";
 import DateTimeDisplay from "./DateTimeDisplay";
 import "./style.scss";
@@ -18,11 +18,12 @@ const CountdownTimer: React.FC<PropsType> = ({ targetDate, onExpire }) => {
     currentDate,
   });
 
-  if (isTimeout) {
-    if (onExpire && typeof onExpire === "function") {
-      onExpire();
-    }
-  }
+  useEffect(() => {
+    if (!isTimeout) return;
+    if (!onExpire && typeof onExpire !== "function") return;
+
+    onExpire();
+  }, [isTimeout]);
   return (
     <>
       <p className="time-title">Thời gian còn lại</p>

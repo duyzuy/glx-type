@@ -26,8 +26,8 @@ const checkoutSlice = createSlice({
       return {
         ...state,
         chanelAndMethod: {
-          channel: action?.payload?.data?.channel,
-          method: action?.payload?.data.method,
+          channel: action.payload.data.channel || [],
+          method: action.payload.data.method || [],
         },
       };
     });

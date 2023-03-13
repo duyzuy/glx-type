@@ -24,54 +24,53 @@ const useCountdown = ({
   );
 
   const [days, hours, minutes, seconds] = getReturnValues(countDown);
-
-  const timeRef = useRef<ReturnType<typeof setTimeout>>();
-  const isOldCounter = useRef(true);
+  initCountdownDate = {
+    ...initCountdownDate,
+    dateTime: [days, hours, minutes, seconds],
+  };
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const isCounterStart = useRef(false);
   const isExpired = targetDateCount < currentDateCount;
 
   useEffect(() => {
     if (targetDateCount < currentDateCount) return;
-
-    timeRef.current = setTimeout(() => {
+    isCounterStart.current = true;
+    timeoutRef.current = setTimeout(() => {
       setCountDown(targetDateCount - currentDateCount);
     }, 1000);
 
-    return () => clearInterval(timeRef.current);
+    return () => clearTimeout(timeoutRef.current);
   }, [currentDateCount]);
 
-  switch (isOldCounter.current) {
+  switch (isCounterStart.current) {
     case true: {
       if (isExpired) {
-        clearInterval(timeRef.current);
-        isOldCounter.current = false;
+        clearTimeout(timeoutRef.current);
+        isCounterStart.current = false;
         initCountdownDate = {
           ...initCountdownDate,
-          isTimeout: false,
-          dateTime: ["00", "00", "00", "00"],
+          isTimeout: true,
         };
       } else {
         initCountdownDate = {
           ...initCountdownDate,
           isTimeout: false,
-          dateTime: [days, hours, minutes, seconds],
         };
       }
       break;
     }
     case false: {
       if (isExpired) {
-        clearInterval(timeRef.current);
-        isOldCounter.current = true;
+        clearTimeout(timeoutRef.current);
+        isCounterStart.current = false;
         initCountdownDate = {
           ...initCountdownDate,
-          isTimeout: true,
-          dateTime: ["00", "00", "00", "00"],
+          isTimeout: false,
         };
       } else {
         initCountdownDate = {
           ...initCountdownDate,
           isTimeout: false,
-          dateTime: [days, hours, minutes, seconds],
         };
       }
       break;
