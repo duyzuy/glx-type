@@ -52,8 +52,8 @@ export const setChannelAndMethod = createAction(
     };
   }
 );
-export const onSelectPaymentMethod = createAsyncThunk(
-  "checkout/onSelectPaymentMethod",
+export const fetchPaymentChannelData = createAsyncThunk(
+  "checkout/fetchPaymentChannelData",
   async (args: {
     channelType: string;
     clientId: string;

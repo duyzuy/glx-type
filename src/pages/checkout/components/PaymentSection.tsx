@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import OrderSummary from "./OrderSummary";
-import { Image } from "semantic-ui-react";
 import {
   BookingType,
   ChanelItemType,
@@ -12,19 +11,16 @@ import {
   DeviceType,
 } from "../../../models";
 import { isEmpty } from "../../../utils/common";
-import CountdownTimer from "../../../components/CountdownTimer";
-import Button from "../../../components/Button";
-import * as Icon from "react-feather";
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { onSelectPaymentMethod, setChannelAndMethod } from "../actions";
+import { fetchPaymentChannelData, setChannelAndMethod } from "../actions";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { checkoutApi } from "../../../api/checkout";
 import Modal from "../../../components/Modal";
 import ModalContent from "./ModalContent";
 import { useNavigate } from "react-router";
-import { IconScan } from "../../../assets/icons";
 import ChannelItem from "./ChannelItem";
-
+import PaymentNote from "./PaymentNote";
+import PaymentMethodContainer from "./PaymentMethodContainer";
 type PropsType = {
   children?: JSX.Element;
   bookingInfo: BookingType;
@@ -38,13 +34,12 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
       (state) => state.checkout.chanelAndMethod
     );
     const profile = useAppSelector((state) => state.userInfo.profile);
-    const channelAndMethodActive = useAppSelector(
+    const bookingChannelMethod = useAppSelector(
       (state) => state.booking.chanelAndMethod
     );
     const navigate = useNavigate();
     const deviceInfo = useAppSelector((state) => state.chanel.deviceInfo);
 
-    const { paymentData, offer } = bookingInfo;
     const [searchParams] = useSearchParams();
     const [modal, setModal] = useState({
       isShowModal: false,
@@ -58,60 +53,106 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
       },
     });
     const [counterStart, setCounterStart] = useState(new Date().getTime());
-    const onSelectPayment = useCallback(
+    const [isLoadingQr, setLoadingQr] = useState(false);
+    const channelCampaign = useMemo(() => {
+      let channelName = "";
+      switch (channelType) {
+        case "zalo": {
+          channelName = WalletName.ZALOPAY;
+          break;
+        }
+        case "shopee": {
+          channelName = WalletName.SHOPEEPAY;
+          break;
+        }
+        case "momo": {
+          channelName = WalletName.MOMO;
+          break;
+        }
+        case "vnpay": {
+          channelName = WalletName.VNPAY;
+          break;
+        }
+        case "moca": {
+          channelName = WalletName.MOCA;
+          break;
+        }
+        case "fundin": {
+          channelName = WalletName.FUNDIIN;
+          break;
+        }
+        case "asiapay": {
+          channelName = WalletName.ASIAPAY;
+          break;
+        }
+      }
+      return (
+        channel.find((item) => item.active && item.type === channelName) || {}
+      );
+    }, [channel]);
+    const onSelectPaymentChannel = useCallback(
       async (chanelItem: ChanelItemType) => {
-        try {
-          const methodActive = method.find(
-            (item) => item.channelName === chanelItem.type
+        let channelAndMethod: {
+          channel: ChanelItemType;
+          method: MethodItemType;
+        } = { channel: chanelItem, method: {} };
+
+        const currentMethod = method.find(
+          (item) => item.channelId === channelCampaign.id
+        );
+        setLoadingQr(true);
+        if (currentMethod) {
+          console.log("method is connected");
+          channelAndMethod = {
+            ...channelAndMethod,
+            method: currentMethod,
+          };
+
+          dispatch(
+            setChannelAndMethod({
+              ...channelAndMethod,
+            })
           );
-          if (methodActive) {
-            console.log("method is connected");
-          } else {
-            let paymentParams = {
-              channelType: channelType,
-              clientId: profile.id || "",
-              returnUrl: window.location.href,
+        } else {
+          dispatch(
+            setChannelAndMethod({
+              ...channelAndMethod,
+            })
+          );
+
+          let paymentParams = {
+            channelType: channelType,
+            clientId: profile.id || "",
+            returnUrl: window.location.href,
+          };
+
+          if (deviceInfo.partner === "mobile") {
+            paymentParams = {
+              ...paymentParams,
+              returnUrl: `${window.location.href}?productId=${bookingInfo.offer.productId}`,
             };
-
-            if (deviceInfo.partner === "mobile") {
-              paymentParams = {
-                ...paymentParams,
-                returnUrl: `${window.location.href}?productId=${bookingInfo.offer.productId}`,
-              };
-            }
-
-            const response = await dispatch(
-              onSelectPaymentMethod({
-                ...paymentParams,
-              })
-            ).unwrap();
-            /**
-             * listen event hub
-             */
-            if (response.error === 0) {
-              await onlistenHubPayment({
-                channelType: channelType,
-                token: response.syncData.token || "",
-                offer: bookingInfo.offer,
-              });
-            }
           }
-        } catch (error) {
-          console.log(error);
+
+          const response = await dispatch(
+            fetchPaymentChannelData({
+              ...paymentParams,
+            })
+          ).unwrap();
+          setLoadingQr(false);
+          /**
+           * listen event hub
+           */
+          if (response.error === 0) {
+            await onlistenHubPayment({
+              channelType: channelType,
+              token: response.syncData.token || "",
+              offer: bookingInfo.offer,
+            });
+          }
         }
       },
       [channelType, profile, deviceInfo, bookingInfo]
     );
-    const [expire, setExpire] = useState(false);
-    const [paymentStatus, setPaymentStatus] = useState({
-      isShowModal: false,
-      errorType: {
-        paymentFail: false,
-        timeout: false,
-        paymentError: false,
-        streamFail: false,
-      },
-    });
 
     /**
      * @param args
@@ -201,7 +242,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
                 if (response.error === 0) {
                   const method = response.data.method?.find(
                     (method) =>
-                      method.channelId === channelAndMethodActive.chanel.id
+                      method.channelId === bookingChannelMethod.chanel.id
                   );
                   /**
                    * SUBMIT PAYMENT
@@ -236,53 +277,6 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
     };
 
     useEffect(() => {
-      let channelName = "";
-      switch (channelType) {
-        case "zalo": {
-          channelName = WalletName.ZALOPAY;
-          break;
-        }
-        case "shopee": {
-          channelName = WalletName.SHOPEEPAY;
-          break;
-        }
-        case "momo": {
-          channelName = WalletName.MOMO;
-          break;
-        }
-        case "vnpay": {
-          channelName = WalletName.VNPAY;
-          break;
-        }
-        case "moca": {
-          channelName = WalletName.MOCA;
-          break;
-        }
-        case "fundin": {
-          channelName = WalletName.FUNDIIN;
-          break;
-        }
-        case "asiapay": {
-          channelName = WalletName.ASIAPAY;
-          break;
-        }
-      }
-
-      const currChannel = channel.find(
-        (item) => item.active && item.type === channelName
-      );
-      const currMethod = method.find(
-        (item) => item.channelName === channelName
-      );
-      dispatch(
-        setChannelAndMethod({
-          method: currMethod || {},
-          channel: currChannel || {},
-        })
-      );
-    }, [channel, channelType, method]);
-
-    useEffect(() => {
       (async () => {
         const status = searchParams.get("status") || "0";
         const bindingId = searchParams.get("binding_id") || "";
@@ -293,7 +287,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
          * case is zalo type
          */
         if (!isEmpty(bookInfor) && status === "1") {
-          const { method } = channelAndMethodActive;
+          const { method } = bookingChannelMethod;
           /**
            * SUBMIT PAYMENT
            */
@@ -305,7 +299,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
           }
         }
       })();
-    }, [channelAndMethodActive]);
+    }, [bookingChannelMethod]);
 
     const onExpiredPaymentQr = () => {
       /**
@@ -338,7 +332,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
           isPaymentError: false,
         },
       });
-      onSelectPayment(chanelItem);
+      onSelectPaymentChannel(chanelItem);
 
       // await onlistenHubPayment({
       //   channelType: channelType,
@@ -360,7 +354,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
               navigate("/");
             } else {
               onRetryPaymentQrcode({
-                chanelItem: channelAndMethodActive.chanel,
+                chanelItem: bookingChannelMethod.chanel,
               });
             }
           }}
@@ -378,131 +372,35 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
               <div className="col-body">
                 <div className="payment-top">
                   <div className="channels">
-                    {!isEmpty(channelAndMethodActive.chanel) && (
+                    {!isEmpty(channelCampaign) && (
                       <ChannelItem
-                        onSelectPayment={onSelectPayment}
-                        channel={channelAndMethodActive.chanel}
+                        onSelectPaymentChannel={onSelectPaymentChannel}
+                        channel={channelCampaign}
                       />
                     )}
                   </div>
-                  <div className="payment-content center">
-                    {(!isEmpty(channelAndMethodActive.method) && (
-                      <>
-                        <div className="methods">
-                          <div
-                            className="method-item"
-                            key={channelAndMethodActive.method.methodId}
-                            onClick={() =>
-                              onSelectPayment(channelAndMethodActive.method)
-                            }
-                          >
-                            <div className="icon">
-                              <Image
-                                src={channelAndMethodActive.method.ico}
-                                className="method payment"
-                              />
-                            </div>
-                            <div className="content">
-                              <p className="name">
-                                {channelAndMethodActive.method.channelName}
-                              </p>
-                              <span className="icon-check">
-                                <Icon.Check size={12} />
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <Button
-                          color="primary"
-                          className="payment-button"
-                          onClick={() =>
-                            handleSubmitPayment({
-                              methodId:
-                                channelAndMethodActive.method.methodId || "",
-                              offer: bookingInfo.offer,
-                            })
-                          }
-                        >
-                          Thanh toán ngay
-                        </Button>
-                      </>
-                    )) ||
-                      (deviceInfo.partner === DeviceType.MOBILE && (
-                        <div className="payment-webview">
-                          <Button
-                            color="primary"
-                            className="payment-button"
-                            onClick={handlePaymentWebview}
-                          >
-                            Thanh toán ngay
-                          </Button>
-                        </div>
-                      )) ||
-                      (!isEmpty(paymentData) && (
-                        <div className="payment-data">
-                          <div className="qrcode">
-                            <Image src={paymentData.qrCodeUrl} />
-                          </div>
-                          <div className="counter">
-                            <CountdownTimer
-                              targetDate={counterStart}
-                              onExpire={onExpiredPaymentQr}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    {(isEmpty(bookingInfo.chanelAndMethod.method) &&
-                      isEmpty(paymentData) && (
-                        <p className="content">
-                          Vui lòng bấm vào {channelType} để thanh toán
-                        </p>
-                      )) || <></>}
-                  </div>
-                </div>
-                <div className="payment-note">
-                  <div className="box">
-                    <div className="content">
-                      <div className="content-qrstep">
-                        <p>Bước 1: Mở ứng dụng và đăng nhập ZaloPay</p>
-                        <p>
-                          Bước 2: Bấm chọn icon
-                          <img
-                            src={IconScan}
-                            width={12}
-                            className="ico-scan"
-                            style={{ marginLeft: "3px", marginRight: "3px" }}
-                          />
-                          ở góc phải phía trên màn hình để quét QR Code
-                        </p>
-                        <p>Bước 3: Bấm chọn “Xác nhận” để thanh toán</p>
-                      </div>
-                      <div className="content-note">
-                        <p className="text center">
-                          Bằng việc thanh toán, Quý khách đã đồng ý với Quy chế
-                          sử dụng Dịch vụ của Galaxy Play và ủy quyền cho Galaxy
-                          Play tự động gia hạn khi hết hạn sử dụng, cho đến khi
-                          bạn hủy tự động gia hạn.
-                        </p>
-                        <div className="secures">
-                          <div className="icon">
-                            <Image
-                              src={`${process.env.PUBLIC_URL}/images/shopee/ssl-secured.png`}
-                              width={100}
-                              className="img-sc"
-                            />
-                          </div>
-                          <div className="icon">
-                            <Image
-                              src={`${process.env.PUBLIC_URL}/images/shopee/DSS-PCI.png`}
-                              width={100}
-                              className="img-sc"
-                            />
-                          </div>
-                        </div>
-                      </div>
+                  {(!isEmpty(bookingChannelMethod.chanel) && (
+                    <PaymentMethodContainer
+                      counterStart={counterStart}
+                      offer={bookingInfo.offer}
+                      onTimeoutQrcode={onExpiredPaymentQr}
+                      paymentData={bookingInfo.paymentData}
+                      currentMethod={bookingChannelMethod.method}
+                      onSubmitPaymentWebview={handlePaymentWebview}
+                      onSubmitPayment={handleSubmitPayment}
+                      channelType={channelType}
+                      isDesktop={deviceInfo.partner === DeviceType.PC}
+                      isLoading={isLoadingQr}
+                    />
+                  )) || (
+                    <div className="empty-channel">
+                      <p className="content center">
+                        Vui lòng bấm vào {channelType} để thanh toán
+                      </p>
                     </div>
-                  </div>
+                  )}
                 </div>
+                <PaymentNote />
               </div>
             </div>
           </div>

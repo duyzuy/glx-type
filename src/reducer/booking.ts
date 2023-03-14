@@ -2,7 +2,7 @@ import { BookingType } from "../models";
 
 import { createReducer } from "@reduxjs/toolkit";
 import {
-  onSelectPaymentMethod,
+  fetchPaymentChannelData,
   setChannelAndMethod,
   onSelectCombo,
   onSelectCinema,
@@ -41,7 +41,7 @@ const bookingReducer = createReducer(initialState, (builder) => {
       },
     };
   });
-  builder.addCase(onSelectPaymentMethod.fulfilled, (state, action) => {
+  builder.addCase(fetchPaymentChannelData.fulfilled, (state, action) => {
     return {
       ...state,
       paymentData: {

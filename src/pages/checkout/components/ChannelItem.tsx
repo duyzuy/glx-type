@@ -3,15 +3,18 @@ import React, { memo } from "react";
 import { ChanelItemType } from "../../../models";
 import { Image } from "semantic-ui-react";
 type PropsType = {
-  onSelectPayment: (channelItem: ChanelItemType) => void;
+  onSelectPaymentChannel: (channelItem: ChanelItemType) => void;
   channel: ChanelItemType;
 };
-const ChannelItem: React.FC<PropsType> = ({ onSelectPayment, channel }) => {
+const ChannelItem: React.FC<PropsType> = ({
+  onSelectPaymentChannel,
+  channel,
+}) => {
   return (
     <div
       className="channel-item"
       key={channel.id}
-      onClick={() => onSelectPayment(channel)}
+      onClick={() => onSelectPaymentChannel(channel)}
     >
       <div className="icon">
         <Image src={channel.ico} className="method payment" />
