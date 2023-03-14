@@ -9,9 +9,7 @@
     text-align: center;
     border-radius: 5px;
     padding: 5px 10px;
-    letter-spacing: 2px;
-    // background: rgb(0 0 0 / 20%);
-    // backdrop-filter: blur(1px);
+    background-color: #f1f1f1;
   }
   p {
     margin-bottom: 0;
@@ -28,7 +26,6 @@
     display: block;
     text-transform: capitalize;
     font-size: 12px;
-    letter-spacing: 1px;
     font-family: "GLX-Lato-Regular";
   }
   .value {

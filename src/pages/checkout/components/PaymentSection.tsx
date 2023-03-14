@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import OrderSummary from "./OrderSummary";
 import {
   BookingType,
-  ChanelItemType,
+  ChannelItemType,
   WalletName,
   OfferItemType,
   MethodItemType,
@@ -33,9 +33,10 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
     const { channel, method } = useAppSelector(
       (state) => state.checkout.chanelAndMethod
     );
+
     const profile = useAppSelector((state) => state.userInfo.profile);
     const bookingChannelMethod = useAppSelector(
-      (state) => state.booking.chanelAndMethod
+      (state) => state.booking.channelAndMethod
     );
     const navigate = useNavigate();
     const deviceInfo = useAppSelector((state) => state.chanel.deviceInfo);
@@ -90,16 +91,18 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
         channel.find((item) => item.active && item.type === channelName) || {}
       );
     }, [channel]);
+
     const onSelectPaymentChannel = useCallback(
-      async (chanelItem: ChanelItemType) => {
+      async (chanelItem: ChannelItemType) => {
         let channelAndMethod: {
-          channel: ChanelItemType;
+          channel: ChannelItemType;
           method: MethodItemType;
         } = { channel: chanelItem, method: {} };
 
         const currentMethod = method.find(
-          (item) => item.channelId === channelCampaign.id
+          (item) => item.channelId === chanelItem.id
         );
+
         setLoadingQr(true);
         if (currentMethod) {
           console.log("method is connected");
@@ -242,7 +245,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
                 if (response.error === 0) {
                   const method = response.data.method?.find(
                     (method) =>
-                      method.channelId === bookingChannelMethod.chanel.id
+                      method.channelId === bookingChannelMethod.channel.id
                   );
                   /**
                    * SUBMIT PAYMENT
@@ -319,7 +322,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
     const onRetryPaymentQrcode = ({
       chanelItem,
     }: {
-      chanelItem: ChanelItemType;
+      chanelItem: ChannelItemType;
     }) => {
       setModal({
         isShowModal: false,
@@ -354,7 +357,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
               navigate("/");
             } else {
               onRetryPaymentQrcode({
-                chanelItem: bookingChannelMethod.chanel,
+                chanelItem: bookingChannelMethod.channel,
               });
             }
           }}
@@ -379,7 +382,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
                       />
                     )}
                   </div>
-                  {(!isEmpty(bookingChannelMethod.chanel) && (
+                  {(!isEmpty(bookingChannelMethod.channel) && (
                     <PaymentMethodContainer
                       counterStart={counterStart}
                       offer={bookingInfo.offer}

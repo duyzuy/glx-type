@@ -32,8 +32,12 @@ const CheckoutPage: React.FC = () => {
 
   const handleSelectCinema = (cinemaItem: VoucherItemType) => {
     dispatch(onSelectCinema(cinemaItem));
-    dispatch(onResetComboSelect());
-    dispatch(onResetPaymentData());
+    if (!isEmpty(bookingInfo.comboItem)) {
+      dispatch(onResetComboSelect());
+    }
+    if (!isEmpty(bookingInfo.paymentData)) {
+      dispatch(onResetPaymentData());
+    }
 
     const timeOut = setTimeout(() => {
       comboSectionRef.current?.scrollIntoView({
@@ -50,7 +54,9 @@ const CheckoutPage: React.FC = () => {
     ).unwrap();
 
     if (response.error === 0) {
-      dispatch(onResetPaymentData());
+      if (!isEmpty(bookingInfo.paymentData)) {
+        dispatch(onResetPaymentData());
+      }
       paymentSectionRef.current?.scrollIntoView({
         behavior: "smooth",
         block: "start",

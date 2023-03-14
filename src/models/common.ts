@@ -43,7 +43,7 @@ export interface VoucherItemType {
   ["3d"]?: ComboItemBaseType;
 }
 
-export type ChanelItemType = {
+export type ChannelItemType = {
   id?: string;
   name?: string;
   type?: string;

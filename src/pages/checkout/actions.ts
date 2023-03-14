@@ -2,7 +2,7 @@ import { checkoutApi } from "../../api/checkout";
 import { createAction, createAsyncThunk } from "@reduxjs/toolkit";
 import { isEmpty } from "../../utils/common";
 import {
-  ChanelItemType,
+  ChannelItemType,
   MethodItemType,
   OfferItemType,
   PaymentDataType,
@@ -41,8 +41,8 @@ export const fetchPromotionsOffer = createAsyncThunk(
   }
 );
 export const setChannelAndMethod = createAction(
-  "checkout/fetchChanelAndMethodCampaign",
-  (args: { channel: ChanelItemType; method: MethodItemType }) => {
+  "checkout/setChannelAndMethod",
+  (args: { channel: ChannelItemType; method: MethodItemType }) => {
     const { channel, method } = args;
     return {
       payload: {

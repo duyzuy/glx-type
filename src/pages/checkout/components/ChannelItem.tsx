@@ -1,10 +1,10 @@
 import React, { memo } from "react";
 
-import { ChanelItemType } from "../../../models";
+import { ChannelItemType } from "../../../models";
 import { Image } from "semantic-ui-react";
 type PropsType = {
-  onSelectPaymentChannel: (channelItem: ChanelItemType) => void;
-  channel: ChanelItemType;
+  onSelectPaymentChannel: (channelItem: ChannelItemType) => void;
+  channel: ChannelItemType;
 };
 const ChannelItem: React.FC<PropsType> = ({
   onSelectPaymentChannel,

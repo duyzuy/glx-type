@@ -11,8 +11,8 @@ import {
 } from "../pages/checkout/actions";
 
 const initialState: BookingType = {
-  chanelAndMethod: {
-    chanel: {},
+  channelAndMethod: {
+    channel: {},
     method: {},
   },
   voucherType: {},
@@ -52,8 +52,8 @@ const bookingReducer = createReducer(initialState, (builder) => {
   builder.addCase(setChannelAndMethod, (state, action) => {
     return {
       ...state,
-      chanelAndMethod: {
-        chanel: { ...action.payload.channel },
+      channelAndMethod: {
+        channel: { ...action.payload.channel },
         method: { ...action.payload.method },
       },
     };
@@ -69,6 +69,10 @@ const bookingReducer = createReducer(initialState, (builder) => {
     return {
       ...state,
       paymentData: {},
+      channelAndMethod: {
+        channel: {},
+        method: {},
+      },
     };
   });
 });

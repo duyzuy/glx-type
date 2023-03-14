@@ -1,5 +1,5 @@
 import {
-  ChanelItemType,
+  ChannelItemType,
   VoucherItemType,
   ComboItemType,
   PaymentDataType,
@@ -8,8 +8,8 @@ import {
 import { OfferItemType } from "./offer";
 
 export interface BookingType {
-  chanelAndMethod: {
-    chanel: ChanelItemType;
+  channelAndMethod: {
+    channel: ChannelItemType;
     method: MethodItemType;
   };
   voucherType: VoucherItemType;
