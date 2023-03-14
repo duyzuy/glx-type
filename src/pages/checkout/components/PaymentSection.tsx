@@ -379,6 +379,7 @@ const PaymentSection = React.forwardRef<HTMLDivElement, PropsType>(
                       <ChannelItem
                         onSelectPaymentChannel={onSelectPaymentChannel}
                         channel={channelCampaign}
+                        isSelected={!isEmpty(bookingChannelMethod.channel)}
                       />
                     )}
                   </div>

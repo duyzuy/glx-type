@@ -98,10 +98,18 @@
 }
 .boxes {
   display: flex;
-  align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  margin-left: -10px;
+  margin-right: -10px;
   .box {
-    padding: 15px;
+    padding: 10px;
+    width: 33.33%;
+    flex-basis: 33.33%;
+    @media screen and (max-width: 768px) {
+      width: 50%;
+      flex-basis: 50%;
+    }
     .icon {
       display: inline-block;
       line-height: 0;
@@ -239,7 +247,7 @@
     flex: 1;
     padding: 20px;
     background-color: #fff;
-    border-radius: 20px;
+    border-radius: 10px;
   }
   .col-summary {
     width: 100%;
@@ -282,7 +290,7 @@
   width: 100%;
   background-color: #fff;
   padding: 20px;
-  border-radius: 20px;
+  border-radius: 10px;
   margin-left: auto;
   margin-right: auto;
   .plan-name {
@@ -320,6 +328,12 @@
   justify-content: center;
   .channel-item + .channel-item {
     margin-left: 15px;
+  }
+  .channel-item {
+    border: 1px solid transparent;
+    &.active {
+      border-color: #1038bd;
+    }
   }
 }
 .method-item {
